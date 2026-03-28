@@ -27,7 +27,11 @@ public MenuAdmin(int nivel) {
     private void aplicarPermisos() {
 
     if (nivel == 1) { // usuario normal
-        RegistrarseMenu.setEnabled(false);
+
+        itemUsuarios.setEnabled(false);
+        itemGamas.setEnabled(false);
+        itemVehiculos.setEnabled(false);
+        itemOfertas.setEnabled(false);
     }
 }
 
@@ -41,22 +45,112 @@ public MenuAdmin(int nivel) {
     private void initComponents() {
 
         jMenuBar1 = new javax.swing.JMenuBar();
-        jMenu1 = new javax.swing.JMenu();
-        RegistrarseMenu = new javax.swing.JMenuItem();
+        menuMantenimientos = new javax.swing.JMenu();
+        itemUsuarios = new javax.swing.JMenuItem();
+        itemGamas = new javax.swing.JMenuItem();
+        itemVehiculos = new javax.swing.JMenuItem();
+        itemClientes = new javax.swing.JMenuItem();
+        itemOfertas = new javax.swing.JMenuItem();
+        menuMovimiento = new javax.swing.JMenu();
+        itemReservas = new javax.swing.JMenuItem();
+        itemRecepcion = new javax.swing.JMenuItem();
+        menuConsultas = new javax.swing.JMenu();
+        itemConClientes = new javax.swing.JMenuItem();
+        itemConClientesId = new javax.swing.JMenuItem();
+        itemConClientesRango = new javax.swing.JMenuItem();
+        itemConVehiculos = new javax.swing.JMenuItem();
+        itemConVehMatricula = new javax.swing.JMenuItem();
+        itemConVehDisponibles = new javax.swing.JMenuItem();
+        itemConVehRentados = new javax.swing.JMenuItem();
+        itemConVehMarca = new javax.swing.JMenuItem();
+        itemConVehGama = new javax.swing.JMenuItem();
+        itemConOfertas = new javax.swing.JMenuItem();
+        itemConVehPrecio = new javax.swing.JMenuItem();
+        itemConReservaFecha = new javax.swing.JMenuItem();
+        itemConReservaDias = new javax.swing.JMenuItem();
+        itemConRecepcionFecha = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jMenu1.setText("Usuarios");
+        menuMantenimientos.setText("Mantenimientos");
 
-        RegistrarseMenu.setText("Registrarse");
-        RegistrarseMenu.addActionListener(new java.awt.event.ActionListener() {
+        itemUsuarios.setText("Usuarios");
+        itemUsuarios.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                RegistrarseMenuActionPerformed(evt);
+                itemUsuariosActionPerformed(evt);
             }
         });
-        jMenu1.add(RegistrarseMenu);
+        menuMantenimientos.add(itemUsuarios);
 
-        jMenuBar1.add(jMenu1);
+        itemGamas.setText("Gamas");
+        menuMantenimientos.add(itemGamas);
+
+        itemVehiculos.setText("Vehiculos");
+        menuMantenimientos.add(itemVehiculos);
+
+        itemClientes.setText("Clientes");
+        menuMantenimientos.add(itemClientes);
+
+        itemOfertas.setText("Ofertas");
+        menuMantenimientos.add(itemOfertas);
+
+        jMenuBar1.add(menuMantenimientos);
+
+        menuMovimiento.setText("Movimientos");
+
+        itemReservas.setText("Reservas Clientes");
+        menuMovimiento.add(itemReservas);
+
+        itemRecepcion.setText("Recepcion Vehiculos");
+        menuMovimiento.add(itemRecepcion);
+
+        jMenuBar1.add(menuMovimiento);
+
+        menuConsultas.setText("Consultas");
+
+        itemConClientes.setText("Clientes");
+        menuConsultas.add(itemConClientes);
+
+        itemConClientesId.setText("Clientes por ID");
+        menuConsultas.add(itemConClientesId);
+
+        itemConClientesRango.setText("Clientes por rango ID");
+        menuConsultas.add(itemConClientesRango);
+
+        itemConVehiculos.setText("Vehiculos");
+        menuConsultas.add(itemConVehiculos);
+
+        itemConVehMatricula.setText("Vehiculo por matricula");
+        menuConsultas.add(itemConVehMatricula);
+
+        itemConVehDisponibles.setText("Vehiculos disponibles");
+        menuConsultas.add(itemConVehDisponibles);
+
+        itemConVehRentados.setText("Vehiculos Rentados");
+        menuConsultas.add(itemConVehRentados);
+
+        itemConVehMarca.setText("Vehiculos por marca");
+        menuConsultas.add(itemConVehMarca);
+
+        itemConVehGama.setText("Vehiculos por gama");
+        menuConsultas.add(itemConVehGama);
+
+        itemConOfertas.setText("Ofertas");
+        menuConsultas.add(itemConOfertas);
+
+        itemConVehPrecio.setText("Vehiculos por precio");
+        menuConsultas.add(itemConVehPrecio);
+
+        itemConReservaFecha.setText("Reservas por fecha");
+        menuConsultas.add(itemConReservaFecha);
+
+        itemConReservaDias.setText("Reservas por dias");
+        menuConsultas.add(itemConReservaDias);
+
+        itemConRecepcionFecha.setText("Recepcion por fecha");
+        menuConsultas.add(itemConRecepcionFecha);
+
+        jMenuBar1.add(menuConsultas);
 
         setJMenuBar(jMenuBar1);
 
@@ -74,11 +168,11 @@ public MenuAdmin(int nivel) {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void RegistrarseMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RegistrarseMenuActionPerformed
+    private void itemUsuariosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemUsuariosActionPerformed
         // TODO add your handling code here:
         new RegistroUsuario().setVisible(true);
         
-    }//GEN-LAST:event_RegistrarseMenuActionPerformed
+    }//GEN-LAST:event_itemUsuariosActionPerformed
 
     /**
      * @param args the command line arguments
@@ -86,8 +180,30 @@ public MenuAdmin(int nivel) {
     
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JMenuItem RegistrarseMenu;
-    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenuItem itemClientes;
+    private javax.swing.JMenuItem itemConClientes;
+    private javax.swing.JMenuItem itemConClientesId;
+    private javax.swing.JMenuItem itemConClientesRango;
+    private javax.swing.JMenuItem itemConOfertas;
+    private javax.swing.JMenuItem itemConRecepcionFecha;
+    private javax.swing.JMenuItem itemConReservaDias;
+    private javax.swing.JMenuItem itemConReservaFecha;
+    private javax.swing.JMenuItem itemConVehDisponibles;
+    private javax.swing.JMenuItem itemConVehGama;
+    private javax.swing.JMenuItem itemConVehMarca;
+    private javax.swing.JMenuItem itemConVehMatricula;
+    private javax.swing.JMenuItem itemConVehPrecio;
+    private javax.swing.JMenuItem itemConVehRentados;
+    private javax.swing.JMenuItem itemConVehiculos;
+    private javax.swing.JMenuItem itemGamas;
+    private javax.swing.JMenuItem itemOfertas;
+    private javax.swing.JMenuItem itemRecepcion;
+    private javax.swing.JMenuItem itemReservas;
+    private javax.swing.JMenuItem itemUsuarios;
+    private javax.swing.JMenuItem itemVehiculos;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenu menuConsultas;
+    private javax.swing.JMenu menuMantenimientos;
+    private javax.swing.JMenu menuMovimiento;
     // End of variables declaration//GEN-END:variables
 }
