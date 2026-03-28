@@ -3,11 +3,13 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package com.mycompany.rentcar.vistas;
+
 import com.mycompany.rentcar.dao.UsuarioDAO;
 import com.mycompany.rentcar.modelo.Usuario;
 import javax.swing.JOptionPane;
+
 public class Login extends javax.swing.JFrame {
-    
+
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Login.class.getName());
 
     /**
@@ -15,7 +17,68 @@ public class Login extends javax.swing.JFrame {
      */
     public Login() {
         initComponents();
+        txtLogin.addActionListener(e -> validarMientrasEscribe());
+        txtPass.addActionListener(e -> validarMientrasEscribe());
+
     }
+
+   private void validarMientrasEscribe() {
+    String login = txtLogin.getText().trim();
+    String pass = new String(txtPass.getPassword()).trim();
+
+    try {
+        UsuarioDAO dao = new UsuarioDAO();
+
+        // ENTER EN LOGIN
+        if (txtLogin.isFocusOwner()) {
+
+            if (login.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Login obligatorio");
+                txtLogin.requestFocus();
+                return;
+            }
+
+            Usuario u = dao.buscarPorLogin(login);
+
+            if (u != null) {
+                JOptionPane.showMessageDialog(this, "Login existe");
+                txtPass.requestFocus();
+            } else {
+                JOptionPane.showMessageDialog(this, "Login no existe");
+                txtLogin.requestFocus();
+            }
+
+            return;
+        }
+
+        // ENTER EN PASSWORD
+        if (txtPass.isFocusOwner()) {
+
+            if (pass.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Password obligatorio");
+                txtPass.requestFocus();
+                return;
+            }
+
+            Usuario u = dao.buscarUsuario(login, pass);
+
+            if (u != null) {
+                JOptionPane.showMessageDialog(this, "Usuario válido");
+
+                new MenuAdmin(u.getNivel()).setVisible(true);
+
+                this.dispose();
+            } else {
+                JOptionPane.showMessageDialog(this, "Password incorrecto");
+                txtPass.setText("");
+                txtPass.requestFocus();
+            }
+        }
+
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Error al validar");
+    }
+}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -99,35 +162,30 @@ public class Login extends javax.swing.JFrame {
     private void btnEntrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEntrarActionPerformed
         // TODO add your handling code here:
         String login = txtLogin.getText().trim();
-    String pass = new String(txtPass.getPassword()).trim();
+        String pass = new String(txtPass.getPassword()).trim();
 
-    if (login.isEmpty() || pass.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Login y Password obligatorios");
-        return;
-    }
-
-    try {
-        UsuarioDAO dao = new UsuarioDAO();
-        Usuario u = dao.buscarUsuario(login, pass);
-
-        if (u != null) {
-            JOptionPane.showMessageDialog(this, "Bienvenido " + login);
-
-            // abrir menú según nivel
-            if (u.getNivel() == 0) {
-                new MenuAdmin().setVisible(true);
-            } else {
-                new MenuUsuario().setVisible(true);
-            }
-
-            this.dispose(); // cerrar login
-        } else {
-            JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrectos");
+        if (login.isEmpty() || pass.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Login y Password obligatorios");
+            return;
         }
 
-    } catch (Exception e) {
-        JOptionPane.showMessageDialog(this, "Error al leer usuarios");
-    }
+        try {
+            UsuarioDAO dao = new UsuarioDAO();
+            Usuario u = dao.buscarUsuario(login, pass);
+
+            if (u != null) {
+                JOptionPane.showMessageDialog(this, "Bienvenido " + login);
+
+                
+
+                this.dispose(); // cerrar login
+            } else {
+                JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrectos");
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error al leer usuarios");
+        }
     }//GEN-LAST:event_btnEntrarActionPerformed
 
     /**

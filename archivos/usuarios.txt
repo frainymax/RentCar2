@@ -1,6 +1,4 @@
 login,pass,nivel,nombre,apellido,email
 admin,123,0,Admin,Principal,admin@gmail.com
 frailin,123456,0,Frailin,Almonte,joel@gmail.com
-ejemplo,123,1,sdfsdfasd,sadfsadfasdsdsad,sdfasdfsd
-sdfasdfasdf,123,1,asdfsadf,sadfsadf,sdfsdfasf
-sara,123,1,sadfasdfs,sdfasdfs,
+sara,123,1,sara,sara,sdfsdf@fsdfasdf.asdfsa
