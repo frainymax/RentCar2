@@ -1,4 +1,4 @@
 login,pass,nivel,nombre,apellido,email
 admin,123,0,Admin,Principal,admin@gmail.com
-frailin,123456,0,Frailin,Almonte,joel@gmail.com
-sara,123,1,sara,sara,sdfsdf@fsdfasdf.asdfsa
+frailin,123,0,Frailin,Almonte,joel@gmail.com
+sara,12,1,sara,sara,sdfsdf@fsdfasdf.asdfsa

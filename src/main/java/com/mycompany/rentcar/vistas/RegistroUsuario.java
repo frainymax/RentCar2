@@ -13,6 +13,7 @@ import javax.swing.JOptionPane;
  */
 public class RegistroUsuario extends javax.swing.JFrame {
     
+    private MenuAdmin menu;
     
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(RegistroUsuario.class.getName());
@@ -20,8 +21,9 @@ public class RegistroUsuario extends javax.swing.JFrame {
     /**
      * Creates new form RegistroUsuario
      */
-    public RegistroUsuario() {
+    public RegistroUsuario(MenuAdmin menu) {
         initComponents();
+        this.menu = menu;
     }
 
     /**
@@ -47,6 +49,7 @@ public class RegistroUsuario extends javax.swing.JFrame {
         EmailLabel1 = new javax.swing.JLabel();
         comboNivel = new javax.swing.JComboBox<>();
         btnGuardar = new javax.swing.JButton();
+        btnVolver = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -92,6 +95,13 @@ public class RegistroUsuario extends javax.swing.JFrame {
             }
         });
 
+        btnVolver.setText("VOLVER");
+        btnVolver.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnVolverActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -120,7 +130,9 @@ public class RegistroUsuario extends javax.swing.JFrame {
                             .addComponent(comboNivel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(128, 128, 128)
-                        .addComponent(btnGuardar)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(btnGuardar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnVolver, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap(22, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -154,7 +166,9 @@ public class RegistroUsuario extends javax.swing.JFrame {
                     .addComponent(comboNivel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(51, 51, 51)
                 .addComponent(btnGuardar)
-                .addContainerGap(126, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(btnVolver)
+                .addContainerGap(85, Short.MAX_VALUE))
         );
 
         registroLabel.getAccessibleContext().setAccessibleName("REGISTROlabel");
@@ -236,30 +250,16 @@ if (tipo.equals("ADMINISTRADOR")) {
         // TODO add your handling code here:
     }//GEN-LAST:event_comboNivelActionPerformed
 
+    private void btnVolverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVolverActionPerformed
+        // TODO add your handling code here:
+        menu.setVisible(true);
+    this.dispose();
+    }//GEN-LAST:event_btnVolverActionPerformed
+
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new RegistroUsuario().setVisible(true));
-    }
+   
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel ApellidoLabel;
@@ -268,6 +268,7 @@ if (tipo.equals("ADMINISTRADOR")) {
     private javax.swing.JLabel NombreLabel;
     private javax.swing.JLabel UsuarioLabel;
     private javax.swing.JButton btnGuardar;
+    private javax.swing.JButton btnVolver;
     private javax.swing.JComboBox<String> comboNivel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel registroLabel;

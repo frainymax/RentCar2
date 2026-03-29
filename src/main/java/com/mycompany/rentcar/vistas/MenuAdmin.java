@@ -44,6 +44,8 @@ public MenuAdmin(int nivel) {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem2 = new javax.swing.JMenuItem();
         jMenuBar1 = new javax.swing.JMenuBar();
         menuMantenimientos = new javax.swing.JMenu();
         itemUsuarios = new javax.swing.JMenuItem();
@@ -69,6 +71,12 @@ public MenuAdmin(int nivel) {
         itemConReservaFecha = new javax.swing.JMenuItem();
         itemConReservaDias = new javax.swing.JMenuItem();
         itemConRecepcionFecha = new javax.swing.JMenuItem();
+        Sesion = new javax.swing.JMenu();
+        itemCerrarSesion = new javax.swing.JMenuItem();
+
+        jMenuItem1.setText("jMenuItem1");
+
+        jMenuItem2.setText("jMenuItem2");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -152,6 +160,18 @@ public MenuAdmin(int nivel) {
 
         jMenuBar1.add(menuConsultas);
 
+        Sesion.setText("Sesion");
+
+        itemCerrarSesion.setText("Cerrar Sesion");
+        itemCerrarSesion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itemCerrarSesionActionPerformed(evt);
+            }
+        });
+        Sesion.add(itemCerrarSesion);
+
+        jMenuBar1.add(Sesion);
+
         setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -170,9 +190,20 @@ public MenuAdmin(int nivel) {
 
     private void itemUsuariosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemUsuariosActionPerformed
         // TODO add your handling code here:
-        new RegistroUsuario().setVisible(true);
+       RegistroUsuario ru = new RegistroUsuario(this);
+ru.setVisible(true);
+this.setVisible(false);
         
     }//GEN-LAST:event_itemUsuariosActionPerformed
+
+    private void itemCerrarSesionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemCerrarSesionActionPerformed
+        // TODO add your handling code here:
+        
+    this.dispose(); // cierra el menú
+
+    new Login().setVisible(true); // vuelve al login
+
+    }//GEN-LAST:event_itemCerrarSesionActionPerformed
 
     /**
      * @param args the command line arguments
@@ -180,6 +211,8 @@ public MenuAdmin(int nivel) {
     
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenu Sesion;
+    private javax.swing.JMenuItem itemCerrarSesion;
     private javax.swing.JMenuItem itemClientes;
     private javax.swing.JMenuItem itemConClientes;
     private javax.swing.JMenuItem itemConClientesId;
@@ -202,6 +235,8 @@ public MenuAdmin(int nivel) {
     private javax.swing.JMenuItem itemUsuarios;
     private javax.swing.JMenuItem itemVehiculos;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenu menuConsultas;
     private javax.swing.JMenu menuMantenimientos;
     private javax.swing.JMenu menuMovimiento;
