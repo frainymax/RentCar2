@@ -18,19 +18,28 @@ public class UsuarioDAO {
 
     File archivo = new File(RUTA);
     List<String> lineas = new ArrayList<>();
-
     boolean actualizado = false;
 
-    // leer todo el archivo
+    // SI el archivo no existe, crearlo con encabezado
+    if (!archivo.exists()) {
+        archivo.getParentFile().mkdirs();
+        archivo.createNewFile();
+    }
+
     BufferedReader br = new BufferedReader(new FileReader(archivo));
     String linea;
 
+    // LEER encabezado
+    String encabezado = br.readLine();
+    if (encabezado == null) {
+        encabezado = "login,pass,nivel,nombre,apellido,email";
+    }
+
     while ((linea = br.readLine()) != null) {
 
-        String[] datos = linea.split(",");
+        String[] datos = linea.split(",", -1);
 
         if (datos[0].equals(nuevo.getLogin())) {
-            // si el login ya existe → reemplazar
             lineas.add(nuevo.toString());
             actualizado = true;
         } else {
@@ -39,13 +48,15 @@ public class UsuarioDAO {
     }
     br.close();
 
-    // si no existía → agregarlo
     if (!actualizado) {
         lineas.add(nuevo.toString());
     }
 
-    // reescribir TODO el archivo
     BufferedWriter bw = new BufferedWriter(new FileWriter(archivo, false));
+
+    // 🔥 ESCRIBIR ENCABEZADO SIEMPRE
+    bw.write(encabezado);
+    bw.newLine();
 
     for (String l : lineas) {
         bw.write(l);
@@ -65,7 +76,7 @@ public class UsuarioDAO {
 
     while ((linea = br.readLine()) != null) {
 
-        String[] datos = linea.split(",");
+        String[] datos = linea.split(",", -1);
 
         String log = datos[0].trim();
         String pass = datos[1].trim();
@@ -92,7 +103,7 @@ public class UsuarioDAO {
     String linea;
 
     while ((linea = br.readLine()) != null) {
-        String[] d = linea.split(",");
+        String[] d = linea.split(",", -1);
 
         if (d[0].equals(login)) {
             br.close();
@@ -118,22 +129,42 @@ public class UsuarioDAO {
 
     while ((linea = br.readLine()) != null) {
 
-        String[] datos = linea.split(",");
+    String[] datos = linea.split(",", -1);
 
-        lista.add(new Usuario(
-                datos[0].trim(),
-                datos[1].trim(),
-                Integer.parseInt(datos[2].trim()),
-                datos[3].trim(),
-                datos[4].trim(),
-                datos[5].trim()
-        ));
+    if (datos.length < 6) {
+        continue; // ignora líneas dañadas
     }
+
+    lista.add(new Usuario(
+            datos[0].trim(),
+            datos[1].trim(),
+            Integer.parseInt(datos[2].trim()),
+            datos[3].trim(),
+            datos[4].trim(),
+            datos[5].trim()
+    ));
+}
     
     
 
     br.close();
     return lista;
+}
+    
+   public void reescribirArchivo(List<Usuario> lista) throws IOException {
+
+    BufferedWriter bw = new BufferedWriter(new FileWriter(RUTA, false));
+
+    // 🔥 escribir encabezado SIEMPRE
+    bw.write("login,pass,nivel,nombre,apellido,email");
+    bw.newLine();
+
+    for (Usuario u : lista) {
+        bw.write(u.toString());
+        bw.newLine();
+    }
+
+    bw.close();
 }
     
 }
