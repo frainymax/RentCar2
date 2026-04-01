@@ -54,7 +54,7 @@ public class UsuarioDAO {
 
     BufferedWriter bw = new BufferedWriter(new FileWriter(archivo, false));
 
-    // 🔥 ESCRIBIR ENCABEZADO SIEMPRE
+    //  ESCRIBIR ENCABEZADO SIEMPRE
     bw.write(encabezado);
     bw.newLine();
 
@@ -149,6 +149,12 @@ public class UsuarioDAO {
 
     br.close();
     return lista;
+    
+}
+    public void eliminarUsuario(String login) throws IOException {
+    List<Usuario> lista = obtenerUsuarios();
+    lista.removeIf(u -> u.getLogin().equals(login));
+    reescribirArchivo(lista);
 }
     
    public void reescribirArchivo(List<Usuario> lista) throws IOException {
@@ -166,5 +172,7 @@ public class UsuarioDAO {
 
     bw.close();
 }
+   
+   
     
 }
