@@ -9,7 +9,7 @@ public abstract class MantenimientoBase extends JFrame {
     protected JButton btnEliminar = new JButton("Eliminar");
     protected JButton btnVolver = new JButton("Volver");
 
-    protected JLabel lblEstado = new JLabel(" ");
+    protected JLabel lblEstado = new JLabel("Nuevo registro");
 
     public MantenimientoBase() {
 
@@ -27,14 +27,44 @@ public abstract class MantenimientoBase extends JFrame {
         setSize(700, 500);
         setLocationRelativeTo(null);
 
-        btnNuevo.addActionListener(e -> nuevo());
-        btnGuardar.addActionListener(e -> guardar());
-        btnEliminar.addActionListener(e -> eliminar());
-        btnVolver.addActionListener(e -> volver()); // ← IMPORTANTE
+        // 🔥 FLUJO CENTRALIZADO
+        btnNuevo.addActionListener(e -> {
+            limpiarCampos();
+            estadoNuevo();
+        });
+
+        btnGuardar.addActionListener(e -> {
+            if (validarCampos()) {
+                guardarRegistro();
+                limpiarCampos();
+                estadoNuevo();
+            }
+        });
+
+        btnEliminar.addActionListener(e -> {
+            eliminarRegistro();
+            limpiarCampos();
+            estadoNuevo();
+        });
+
+        btnVolver.addActionListener(e -> volver());
     }
 
-    protected abstract void nuevo();
-    protected abstract void guardar();
-    protected abstract void eliminar();
-    protected abstract void volver(); // ← NUEVO
+    // ===== MÉTODOS QUE HIJOS IMPLEMENTAN =====
+    protected abstract void limpiarCampos();
+    protected abstract boolean validarCampos();
+    protected abstract void guardarRegistro();
+    protected abstract void eliminarRegistro();
+    protected abstract void volver();
+
+    // ===== CONTROL DE ESTADO =====
+    protected void estadoNuevo() {
+        lblEstado.setText("Creando registro");
+        btnEliminar.setEnabled(false);
+    }
+
+    protected void estadoModificar() {
+        lblEstado.setText("Modificando registro");
+        btnEliminar.setEnabled(true);
+    }
 }

@@ -10,7 +10,24 @@ public class GamaDAO {
 
     private final String RUTA = "archivos/gamas.txt";
 
-    public Gama buscarPorId(int id) throws IOException {
+    // ===== ASEGURA QUE EL ARCHIVO EXISTA =====
+    private void asegurarArchivo() throws IOException {
+        File archivo = new File(RUTA);
+
+        if (!archivo.exists()) {
+            archivo.getParentFile().mkdirs();
+            archivo.createNewFile();
+
+            BufferedWriter bw = new BufferedWriter(new FileWriter(archivo));
+            bw.write("id,descripcion,precio");
+            bw.newLine();
+            bw.close();
+        }
+    }
+
+    // ===== BUSCAR =====
+    public Gama buscarPorId(String id) throws IOException {
+        asegurarArchivo();
 
         BufferedReader br = new BufferedReader(new FileReader(RUTA));
         br.readLine(); // encabezado
@@ -18,41 +35,37 @@ public class GamaDAO {
         String linea;
         while ((linea = br.readLine()) != null) {
             String[] d = linea.split(",", -1);
-            if (Integer.parseInt(d[0]) == id) {
+
+            if (d[0].equals(id)) {
                 br.close();
                 return new Gama(
-                        Integer.parseInt(d[0]),
+                        d[0],
                         d[1],
                         Double.parseDouble(d[2])
                 );
             }
         }
+
         br.close();
         return null;
     }
 
-    public void guardar(Gama nueva, int idOriginal) throws IOException {
+    // ===== GUARDAR / MODIFICAR =====
+    public void guardarGama(Gama nueva, String idOriginal) throws IOException {
 
-        File archivo = new File(RUTA);
+        asegurarArchivo();
+
         List<String> lineas = new ArrayList<>();
         boolean actualizado = false;
 
-        if (!archivo.exists()) {
-            archivo.getParentFile().mkdirs();
-            archivo.createNewFile();
-        }
-
-        BufferedReader br = new BufferedReader(new FileReader(archivo));
+        BufferedReader br = new BufferedReader(new FileReader(RUTA));
         String encabezado = br.readLine();
-        if (encabezado == null) {
-            encabezado = "id,descripcion,precio";
-        }
 
         String linea;
         while ((linea = br.readLine()) != null) {
             String[] d = linea.split(",", -1);
 
-            if (Integer.parseInt(d[0]) == idOriginal) {
+            if (d[0].equals(idOriginal)) {
                 lineas.add(nueva.toString());
                 actualizado = true;
             } else {
@@ -65,7 +78,7 @@ public class GamaDAO {
             lineas.add(nueva.toString());
         }
 
-        BufferedWriter bw = new BufferedWriter(new FileWriter(archivo, false));
+        BufferedWriter bw = new BufferedWriter(new FileWriter(RUTA, false));
         bw.write(encabezado);
         bw.newLine();
 
@@ -73,10 +86,46 @@ public class GamaDAO {
             bw.write(l);
             bw.newLine();
         }
+
         bw.close();
     }
 
-    public List<Gama> obtenerTodas() throws IOException {
+    // ===== ELIMINAR =====
+    public void eliminarGama(String id) throws IOException {
+
+        asegurarArchivo();
+
+        List<String> lineas = new ArrayList<>();
+
+        BufferedReader br = new BufferedReader(new FileReader(RUTA));
+        String encabezado = br.readLine();
+
+        String linea;
+        while ((linea = br.readLine()) != null) {
+            String[] d = linea.split(",", -1);
+
+            if (!d[0].equals(id)) {
+                lineas.add(linea);
+            }
+        }
+        br.close();
+
+        BufferedWriter bw = new BufferedWriter(new FileWriter(RUTA, false));
+        bw.write(encabezado);
+        bw.newLine();
+
+        for (String l : lineas) {
+            bw.write(l);
+            bw.newLine();
+        }
+
+        bw.close();
+    }
+
+    // ===== LISTAR =====
+    public List<Gama> obtenerGamas() throws IOException {
+        asegurarArchivo();
+
         List<Gama> lista = new ArrayList<>();
 
         BufferedReader br = new BufferedReader(new FileReader(RUTA));
@@ -85,12 +134,14 @@ public class GamaDAO {
         String linea;
         while ((linea = br.readLine()) != null) {
             String[] d = linea.split(",", -1);
+
             lista.add(new Gama(
-                    Integer.parseInt(d[0]),
+                    d[0],
                     d[1],
                     Double.parseDouble(d[2])
             ));
         }
+
         br.close();
         return lista;
     }
