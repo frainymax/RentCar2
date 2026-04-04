@@ -2,102 +2,87 @@ package com.mycompany.rentcar.vistas;
 
 import com.mycompany.rentcar.dao.UsuarioDAO;
 import com.mycompany.rentcar.modelo.Usuario;
+
 import javax.swing.*;
-import javax.swing.event.CellEditorListener;
-import javax.swing.event.ChangeEvent;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 import java.io.IOException;
 
 public class RegistroUsuario extends MantenimientoBase {
 
-    private MenuAdmin menu;
+    private String loginOriginal = "";
+
     private UsuarioDAO dao = new UsuarioDAO();
+    private MenuAdmin menu;
+
+    // ===== CAMPOS =====
+    private JTextField txtLogin = new JTextField(10);
+    private JPasswordField txtPass = new JPasswordField(10);
+    private JTextField txtNombre = new JTextField(10);
+    private JTextField txtApellido = new JTextField(10);
+    private JTextField txtEmail = new JTextField(10);
+    private JComboBox<String> cmbNivel
+            = new JComboBox<>(new String[]{"0 - ADMIN", "1 - USUARIO"});
+
+    // ===== TABLA =====
+    private JTable tabla = new JTable();
+    private DefaultTableModel modelo = new DefaultTableModel();
 
     public RegistroUsuario(MenuAdmin menu) {
+
         super();
         this.menu = menu;
 
         setTitle("Mantenimiento de Usuarios");
 
-        modelo.addColumn("Login");
-        modelo.addColumn("Clave");
-        modelo.addColumn("Nombre");
-        modelo.addColumn("Apellido");
-        modelo.addColumn("Email");
-        modelo.addColumn("Nivel");
+        // ===== FORMULARIO =====
+        JPanel form = new JPanel(new GridLayout(6, 2, 10, 10));
 
-        // Combo nivel
-        String[] niveles = {"", "0 - ADMIN", "1 - USUARIO"};
-        JComboBox<String> comboNivel = new JComboBox<>(niveles);
-        tabla.getColumnModel().getColumn(5)
-                .setCellEditor(new DefaultCellEditor(comboNivel));
+        form.add(new JLabel("Login"));
+        form.add(txtLogin);
 
-        cargarDatos();
+        form.add(new JLabel("Password"));
+        form.add(txtPass);
 
-        //  EVENTO DEL LOGIN 
-        DefaultCellEditor editorLogin = new DefaultCellEditor(new JTextField());
+        form.add(new JLabel("Nombre"));
+        form.add(txtNombre);
 
-        editorLogin.addCellEditorListener(new CellEditorListener() {
+        form.add(new JLabel("Apellido"));
+        form.add(txtApellido);
 
-            @Override
-            public void editingStopped(ChangeEvent e) {
+        form.add(new JLabel("Email"));
+        form.add(txtEmail);
 
-                int fila = tabla.getSelectedRow();
-                if (fila == -1) return;
+        form.add(new JLabel("Nivel"));
+        form.add(cmbNivel);
 
-                String login = modelo.getValueAt(fila, 0).toString().trim();
-                if (login.isEmpty()) return;
+        add(form);
 
-                try {
-                    Usuario u = dao.buscarPorLogin(login);
+        // ===== TABLA SOLO VISUAL =====
+        modelo.setColumnIdentifiers(
+                new String[]{"Login", "Nombre", "Apellido", "Email", "Nivel"}
+        );
 
-                    if (u != null) {
-                        modelo.setValueAt(u.getPass(), fila, 1);
-                        modelo.setValueAt(u.getNombre(), fila, 2);
-                        modelo.setValueAt(u.getApellido(), fila, 3);
-                        modelo.setValueAt(u.getEmail(), fila, 4);
-                        modelo.setValueAt(
-                                u.getNivel() == 0 ? "0 - ADMIN" : "1 - USUARIO",
-                                fila, 5
-                        );
+        tabla.setModel(modelo);
+        tabla.setEnabled(false);
 
-                        JOptionPane.showMessageDialog(RegistroUsuario.this,
-                                "Modificando usuario existente");
+        add(new JScrollPane(tabla));
 
-                    } else {
-                        JOptionPane.showMessageDialog(RegistroUsuario.this,
-                                "Creando nuevo usuario");
-                    }
-
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-
-            @Override
-            public void editingCanceled(ChangeEvent e) { }
-        });
-
-        tabla.getColumnModel().getColumn(0).setCellEditor(editorLogin);
-
-        btnVolver.addActionListener(e -> {
-            menu.setVisible(true);
-            dispose();
-        });
+        cargarTabla();
+        eventos();
     }
 
-    @Override
-    protected void cargarDatos() {
+    private void cargarTabla() {
         try {
             modelo.setRowCount(0);
 
             for (Usuario u : dao.obtenerUsuarios()) {
                 modelo.addRow(new Object[]{
-                        u.getLogin(),
-                        u.getPass(),
-                        u.getNombre(),
-                        u.getApellido(),
-                        u.getEmail(),
-                        u.getNivel() == 0 ? "0 - ADMIN" : "1 - USUARIO"
+                    u.getLogin(),
+                    u.getNombre(),
+                    u.getApellido(),
+                    u.getEmail(),
+                    u.getNivel()
                 });
             }
 
@@ -106,57 +91,87 @@ public class RegistroUsuario extends MantenimientoBase {
         }
     }
 
+    private void eventos() {
+
+        txtLogin.addActionListener(e -> {
+            try {
+                Usuario u = dao.buscarPorLogin(txtLogin.getText().trim());
+
+                if (u != null) {
+                    loginOriginal = u.getLogin();
+                    txtPass.setText(u.getPass());
+                    txtNombre.setText(u.getNombre());
+                    txtApellido.setText(u.getApellido());
+                    txtEmail.setText(u.getEmail());
+                    cmbNivel.setSelectedIndex(u.getNivel());
+
+                    lblEstado.setText("Modificando usuario");
+                    btnNuevo.setEnabled(false);
+                    btnEliminar.setEnabled(true);
+
+                } else {
+                    lblEstado.setText("Creando usuario");
+                    btnNuevo.setEnabled(true);
+                    btnEliminar.setEnabled(false);
+                }
+
+            } catch (Exception ex) {
+            }
+        });
+
+        tabla.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                int fila = tabla.getSelectedRow();
+                txtLogin.setText(modelo.getValueAt(fila, 0).toString());
+                txtLogin.postActionEvent();
+            }
+        });
+    }
+
     @Override
     protected void nuevo() {
-        modelo.addRow(new Object[]{"", "", "", "", "", ""});
+        txtLogin.setText("");
+        txtPass.setText("");
+        txtNombre.setText("");
+        txtApellido.setText("");
+        txtEmail.setText("");
+        cmbNivel.setSelectedIndex(0);
+        lblEstado.setText("Nuevo usuario");
+
+        btnNuevo.setEnabled(true);
+        btnEliminar.setEnabled(false);
+        loginOriginal = "";
     }
 
     @Override
     protected void guardar() {
-
-        //  Forzar que termine la edición antes de leer la tabla
-        if (tabla.isEditing()) {
-            tabla.getCellEditor().stopCellEditing();
-        }
-
-        int fila = tabla.getSelectedRow();
-
-        if (fila == -1) {
-            JOptionPane.showMessageDialog(this, "Seleccione una fila");
-            return;
-        }
-
         try {
-            String login = modelo.getValueAt(fila, 0).toString().trim();
-            String pass = modelo.getValueAt(fila, 1).toString().trim();
-            String nombre = modelo.getValueAt(fila, 2).toString().trim();
-            String apellido = modelo.getValueAt(fila, 3).toString().trim();
 
-            String email = "";
-            if (modelo.getValueAt(fila, 4) != null) {
-                email = modelo.getValueAt(fila, 4).toString().trim();
-            }
+            if (txtLogin.getText().isEmpty()
+                    || txtPass.getPassword().length == 0
+                    || txtNombre.getText().isEmpty()
+                    || txtApellido.getText().isEmpty()) {
 
-            String nivelTexto = modelo.getValueAt(fila, 5).toString().trim();
-
-            //  Validación obligatorios
-            if (login.isEmpty() || pass.isEmpty()
-                    || nombre.isEmpty() || apellido.isEmpty()
-                    || nivelTexto.isEmpty()) {
-
-                JOptionPane.showMessageDialog(this,
-                        "Login, Clave, Nombre y Apellido son obligatorios");
+                JOptionPane.showMessageDialog(this, "Campos obligatorios vacíos");
                 return;
             }
 
-            int nivel = nivelTexto.startsWith("0") ? 0 : 1;
+            Usuario u = new Usuario(
+                    txtLogin.getText(),
+                    new String(txtPass.getPassword()),
+                    cmbNivel.getSelectedIndex(),
+                    txtNombre.getText(),
+                    txtApellido.getText(),
+                    txtEmail.getText()
+            );
 
-            Usuario u = new Usuario(login, pass, nivel, nombre, apellido, email);
+            dao.guardarUsuario(u, loginOriginal);
 
-            dao.guardarUsuario(u);
+            loginOriginal = txtLogin.getText();
 
-            JOptionPane.showMessageDialog(this, "Usuario guardado correctamente");
-            cargarDatos();
+            cargarTabla();
+            JOptionPane.showMessageDialog(this, "Usuario guardado");
+            nuevo();
 
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error al guardar");
@@ -165,28 +180,19 @@ public class RegistroUsuario extends MantenimientoBase {
 
     @Override
     protected void eliminar() {
-
-        if (tabla.isEditing()) {
-            tabla.getCellEditor().stopCellEditing();
-        }
-
-        int fila = tabla.getSelectedRow();
-
-        if (fila == -1) {
-            JOptionPane.showMessageDialog(this, "Seleccione la fila a eliminar");
-            return;
-        }
-
         try {
-            String login = modelo.getValueAt(fila, 0).toString().trim();
-
-            dao.eliminarUsuario(login);
-
+            dao.eliminarUsuario(loginOriginal); // usa el original
+            cargarTabla();
             JOptionPane.showMessageDialog(this, "Usuario eliminado");
-            cargarDatos();
-
+            nuevo();  // ← LIMPIA TODO
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error eliminando usuario");
+            JOptionPane.showMessageDialog(this, "Error al eliminar");
         }
+    }
+
+    @Override
+    protected void volver() {
+        this.dispose();
+        menu.setVisible(true);
     }
 }

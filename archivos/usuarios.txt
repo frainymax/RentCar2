@@ -1,3 +1,3 @@
 login,pass,nivel,nombre,apellido,email
-frailin,123,0,Frailin,almonte,joel@gmail.com
-pedro,1234,1,pedroas,suarez,dsasd@d.dd
+frailin,123,0,Frailin,Almonte,lapara@aaa.ddd
+lara,123,1,laurel,petranza,aaa@@sss.ssss

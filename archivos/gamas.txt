@@ -1,0 +1,2 @@
+id,descripcion,precio
+3234,alta,2000.0

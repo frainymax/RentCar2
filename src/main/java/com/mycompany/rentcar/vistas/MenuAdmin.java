@@ -9,31 +9,30 @@ package com.mycompany.rentcar.vistas;
  * @author User
  */
 public class MenuAdmin extends javax.swing.JFrame {
-    
-    
+
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(MenuAdmin.class.getName());
 
     /**
      * Creates new form MenuAdmin
      */
-   private int nivel;
+    private int nivel;
 
-public MenuAdmin(int nivel) {
-    initComponents();
-    this.nivel = nivel;
-    aplicarPermisos();
-}
-    
+    public MenuAdmin(int nivel) {
+        initComponents();
+        this.nivel = nivel;
+        aplicarPermisos();
+    }
+
     private void aplicarPermisos() {
 
-    if (nivel == 1) { // usuario normal
+        if (nivel == 1) { // usuario normal
 
-        itemUsuarios.setEnabled(false);
-        itemGamas.setEnabled(false);
-        itemVehiculos.setEnabled(false);
-        itemOfertas.setEnabled(false);
+            itemUsuarios.setEnabled(false);
+            itemGamas.setEnabled(false);
+            itemVehiculos.setEnabled(false);
+            itemOfertas.setEnabled(false);
+        }
     }
-}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -91,6 +90,11 @@ public MenuAdmin(int nivel) {
         menuMantenimientos.add(itemUsuarios);
 
         itemGamas.setText("Gamas");
+        itemGamas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itemGamasActionPerformed(evt);
+            }
+        });
         menuMantenimientos.add(itemGamas);
 
         itemVehiculos.setText("Vehiculos");
@@ -190,25 +194,31 @@ public MenuAdmin(int nivel) {
 
     private void itemUsuariosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemUsuariosActionPerformed
         // TODO add your handling code here:
-       RegistroUsuario ru = new RegistroUsuario(this);
-ru.setVisible(true);
-this.setVisible(false);
-        
+        RegistroUsuario ru = new RegistroUsuario(this);
+        ru.setVisible(true);
+        this.setVisible(false);
+
     }//GEN-LAST:event_itemUsuariosActionPerformed
 
     private void itemCerrarSesionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemCerrarSesionActionPerformed
         // TODO add your handling code here:
-        
-    this.dispose(); // cierra el menú
 
-    new Login().setVisible(true); // vuelve al login
+        this.dispose(); // cierra el menú
+
+        new Login().setVisible(true); // vuelve al login
 
     }//GEN-LAST:event_itemCerrarSesionActionPerformed
+
+    private void itemGamasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemGamasActionPerformed
+        // TODO add your handling code here:
+        RegistroGama rg = new RegistroGama(this);
+        rg.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_itemGamasActionPerformed
 
     /**
      * @param args the command line arguments
      */
-    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu Sesion;

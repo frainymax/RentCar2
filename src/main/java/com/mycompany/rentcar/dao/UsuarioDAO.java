@@ -14,32 +14,30 @@ public class UsuarioDAO {
     
      private final String RUTA = "archivos/usuarios.txt";
 
-    public void guardarUsuario(Usuario nuevo) throws IOException {
+    public void guardarUsuario(Usuario nuevo, String loginOriginal) throws IOException {
 
     File archivo = new File(RUTA);
     List<String> lineas = new ArrayList<>();
     boolean actualizado = false;
 
-    // SI el archivo no existe, crearlo con encabezado
     if (!archivo.exists()) {
         archivo.getParentFile().mkdirs();
         archivo.createNewFile();
     }
 
     BufferedReader br = new BufferedReader(new FileReader(archivo));
-    String linea;
-
-    // LEER encabezado
     String encabezado = br.readLine();
     if (encabezado == null) {
         encabezado = "login,pass,nivel,nombre,apellido,email";
     }
 
+    String linea;
     while ((linea = br.readLine()) != null) {
 
         String[] datos = linea.split(",", -1);
 
-        if (datos[0].equals(nuevo.getLogin())) {
+        // AQUÍ ESTÁ LA MAGIA
+        if (datos[0].equals(loginOriginal)) {
             lineas.add(nuevo.toString());
             actualizado = true;
         } else {
@@ -53,8 +51,6 @@ public class UsuarioDAO {
     }
 
     BufferedWriter bw = new BufferedWriter(new FileWriter(archivo, false));
-
-    //  ESCRIBIR ENCABEZADO SIEMPRE
     bw.write(encabezado);
     bw.newLine();
 
