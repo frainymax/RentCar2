@@ -98,6 +98,11 @@ public class MenuAdmin extends javax.swing.JFrame {
         menuMantenimientos.add(itemGamas);
 
         itemVehiculos.setText("Vehiculos");
+        itemVehiculos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itemVehiculosActionPerformed(evt);
+            }
+        });
         menuMantenimientos.add(itemVehiculos);
 
         itemClientes.setText("Clientes");
@@ -215,6 +220,13 @@ public class MenuAdmin extends javax.swing.JFrame {
         rg.setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_itemGamasActionPerformed
+
+    private void itemVehiculosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemVehiculosActionPerformed
+        // TODO add your handling code here:
+        RegistroVehiculo rv = new RegistroVehiculo(this);
+        rv.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_itemVehiculosActionPerformed
 
     /**
      * @param args the command line arguments
