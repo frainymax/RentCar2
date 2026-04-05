@@ -9,7 +9,10 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
+
+
 public class RegistroVehiculo extends MantenimientoBase {
+    private boolean chkTocado = false;
 
     private VehiculoDAO dao = new VehiculoDAO();
     private GamaDAO gamaDAO = new GamaDAO();
@@ -64,7 +67,7 @@ public class RegistroVehiculo extends MantenimientoBase {
         });
 
         tabla.setModel(modelo);
-        tabla.setEnabled(false);
+        tabla.setEnabled(true); // 🔥 CLAVE
 
         contenedor.add(new JScrollPane(tabla), BorderLayout.CENTER);
 
@@ -83,22 +86,35 @@ public class RegistroVehiculo extends MantenimientoBase {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 int fila = tabla.getSelectedRow();
                 txtMat.setText(modelo.getValueAt(fila, 0).toString());
-                txtMat.postActionEvent();
+                buscarVehiculo(); // 🔥 YA NO postActionEvent
             }
         });
+        chkTecho.addActionListener(e -> chkTocado = true);
+chkAire.addActionListener(e -> chkTocado = true);
+chkCuero.addActionListener(e -> chkTocado = true);
+chkAuto.addActionListener(e -> chkTocado = true);
     }
+    
+    
 
-    private void buscarGama() {
-        try {
-            Gama g = gamaDAO.buscarPorId(txtGama.getText());
-            if (g != null) {
-                txtDescGama.setText(g.getDescripcion());
-                txtPrecioGama.setText(String.valueOf(g.getPrecio()));
-            }
-        } catch (Exception ignored) {}
+   private void buscarGama() {
+    try {
+        Gama g = gamaDAO.buscarPorId(txtGama.getText().trim());
+
+        if (g != null) {
+            txtDescGama.setText(g.getDescripcion());
+            txtPrecioGama.setText(String.valueOf(g.getPrecio()));
+        } else {
+            txtDescGama.setText("");
+            txtPrecioGama.setText("");
+            JOptionPane.showMessageDialog(this, "Id Gama no existe");
+        }
+
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Error buscando Gama");
     }
+}
 
-    // 🔥 ESTE ERA EL PROBLEMA
     private void buscarVehiculo() {
         try {
             Vehiculo v = dao.buscar(txtMat.getText());
@@ -121,10 +137,8 @@ public class RegistroVehiculo extends MantenimientoBase {
                 chkStatus.setSelected(v.isStatus());
 
                 buscarGama();
-
                 estadoModificar();
             } else {
-                original = "";
                 estadoNuevo();
             }
         } catch (Exception ignored) {}
@@ -163,17 +177,41 @@ public class RegistroVehiculo extends MantenimientoBase {
         chkStatus.setSelected(false);
 
         original = "";
+        chkTocado = false;
         cargarTabla();
+        
     }
 
     @Override
-    protected boolean validarCampos() {
-        return !(txtMat.getText().isEmpty()
-                || txtMarca.getText().isEmpty()
-                || txtModelo.getText().isEmpty()
-                || txtGama.getText().isEmpty()
-                || txtColor.getText().isEmpty());
+ 
+protected boolean validarCampos() {
+
+    if (txtMat.getText().isEmpty()
+            || txtMarca.getText().isEmpty()
+            || txtModelo.getText().isEmpty()
+            || txtGama.getText().isEmpty()
+            || txtColor.getText().isEmpty()) {
+
+        JOptionPane.showMessageDialog(this, "Campos obligatorios vacíos");
+        return false;
     }
+
+    if (!chkTocado) {
+        JOptionPane.showMessageDialog(this, "Debe seleccionar las características del vehículo (checks)");
+        return false;
+    }
+
+    try {
+        if (gamaDAO.buscarPorId(txtGama.getText().trim()) == null) {
+            JOptionPane.showMessageDialog(this, "Id Gama no existe");
+            return false;
+        }
+    } catch (Exception e) {
+        return false;
+    }
+
+    return true;
+}
 
     @Override
     protected void guardarRegistro() {
@@ -195,17 +233,24 @@ public class RegistroVehiculo extends MantenimientoBase {
             );
 
             dao.guardar(v, original);
-            original = txtMat.getText();
-
             JOptionPane.showMessageDialog(this, "Vehículo guardado");
-            cargarTabla();
+            limpiarCampos();
+
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error al guardar");
         }
     }
 
     @Override
-    protected void eliminarRegistro() {}
+    protected void eliminarRegistro() {
+        try {
+            dao.eliminar(original); // 🔥 AHORA SÍ BORRA
+            JOptionPane.showMessageDialog(this, "Vehículo eliminado");
+            limpiarCampos();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error al eliminar");
+        }
+    }
 
     @Override
     protected void volver() {

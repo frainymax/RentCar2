@@ -71,6 +71,35 @@ public class VehiculoDAO {
         for(String s: lineas){ bw.write(s); bw.newLine(); }
         bw.close();
     }
+    
+    public void eliminar(String matricula) throws IOException {
+
+    File archivo = new File(RUTA);
+    List<String> lineas = new ArrayList<>();
+
+    BufferedReader br = new BufferedReader(new FileReader(archivo));
+    String encabezado = br.readLine(); // guardar encabezado
+
+    String linea;
+    while ((linea = br.readLine()) != null) {
+        String[] d = linea.split(",", -1);
+
+        if (!d[0].equals(matricula)) { // d[0] = matricula
+            lineas.add(linea);
+        }
+    }
+    br.close();
+
+    BufferedWriter bw = new BufferedWriter(new FileWriter(archivo, false));
+    bw.write(encabezado);
+    bw.newLine();
+
+    for (String l : lineas) {
+        bw.write(l);
+        bw.newLine();
+    }
+    bw.close();
+}
 
     public List<Vehiculo> listar() throws IOException {
         asegurar();

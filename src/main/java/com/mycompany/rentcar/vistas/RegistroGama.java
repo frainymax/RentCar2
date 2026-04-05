@@ -48,7 +48,7 @@ public class RegistroGama extends MantenimientoBase {
         );
 
         tabla.setModel(modelo);
-        tabla.setEnabled(false);
+        tabla.setEnabled(true);
 
         add(new JScrollPane(tabla));
 

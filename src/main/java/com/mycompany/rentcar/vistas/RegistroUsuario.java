@@ -47,7 +47,7 @@ public class RegistroUsuario extends MantenimientoBase {
         );
 
         tabla.setModel(modelo);
-        tabla.setEnabled(false);
+        tabla.setEnabled(true);
 
         add(new JScrollPane(tabla));
 
