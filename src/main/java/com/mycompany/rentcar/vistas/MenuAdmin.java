@@ -106,9 +106,19 @@ public class MenuAdmin extends javax.swing.JFrame {
         menuMantenimientos.add(itemVehiculos);
 
         itemClientes.setText("Clientes");
+        itemClientes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itemClientesActionPerformed(evt);
+            }
+        });
         menuMantenimientos.add(itemClientes);
 
         itemOfertas.setText("Ofertas");
+        itemOfertas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itemOfertasActionPerformed(evt);
+            }
+        });
         menuMantenimientos.add(itemOfertas);
 
         jMenuBar1.add(menuMantenimientos);
@@ -227,6 +237,23 @@ public class MenuAdmin extends javax.swing.JFrame {
         rv.setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_itemVehiculosActionPerformed
+
+    private void itemOfertasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemOfertasActionPerformed
+        // TODO add your handling code here:
+        
+        itemOfertas.addActionListener(e -> {
+    new RegistroOferta(this).setVisible(true);
+    this.setVisible(false);
+});
+    }//GEN-LAST:event_itemOfertasActionPerformed
+
+    private void itemClientesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemClientesActionPerformed
+        // TODO add your handling code here:
+        itemClientes.addActionListener(e -> {
+    new RegistroCliente(this).setVisible(true);
+    this.setVisible(false);
+});
+    }//GEN-LAST:event_itemClientesActionPerformed
 
     /**
      * @param args the command line arguments

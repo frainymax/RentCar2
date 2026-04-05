@@ -1,4 +1,4 @@
 matricula,marca,modelo,tipoVeh,tipoMotor,gama,desc,techo,aire,cuero,color,auto,status
-214,toyota,lapara,1,1,4444,alta,false,true,false,amarillo,false,false
+214,toyota,lapara,1,1,3,alta,true,true,false,amarillo,false,true
 1234,Sonata,2324,1,1,1,baja,false,true,true,mamen,false,true
 3424312,rweqrwqer,qwerwqer,0,1,2,media,false,false,false,ok,false,false

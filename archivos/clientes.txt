@@ -1,0 +1,2 @@
+cedula,nombre,apellido,direccion,email,telefono
+0958304985,Petronila,Lapara,wayyyy,lapara@6666.kk,66666
