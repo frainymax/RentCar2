@@ -162,30 +162,34 @@ public class Login extends javax.swing.JFrame {
     private void btnEntrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEntrarActionPerformed
         // TODO add your handling code here:
         String login = txtLogin.getText().trim();
-        String pass = new String(txtPass.getPassword()).trim();
+    String pass = new String(txtPass.getPassword()).trim();
 
-        if (login.isEmpty() || pass.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Login y Password obligatorios");
-            return;
+    if (login.isEmpty() || pass.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Login y Password obligatorios");
+        return;
+    }
+
+    try {
+        UsuarioDAO dao = new UsuarioDAO();
+        Usuario u = dao.buscarUsuario(login, pass);
+
+        if (u != null) {
+            JOptionPane.showMessageDialog(this, "Bienvenido " + login);
+
+            // 🔥 ABRIR MENÚ
+            MenuAdmin menu = new MenuAdmin(0);
+            menu.setVisible(true);
+
+            // 🔥 CERRAR LOGIN
+            this.dispose();
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrectos");
         }
 
-        try {
-            UsuarioDAO dao = new UsuarioDAO();
-            Usuario u = dao.buscarUsuario(login, pass);
-
-            if (u != null) {
-                JOptionPane.showMessageDialog(this, "Bienvenido " + login);
-
-                
-
-                this.dispose(); // cerrar login
-            } else {
-                JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrectos");
-            }
-
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error al leer usuarios");
-        }
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Error al leer usuarios");
+    }
     }//GEN-LAST:event_btnEntrarActionPerformed
 
     /**

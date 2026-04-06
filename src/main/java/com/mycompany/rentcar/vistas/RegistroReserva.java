@@ -70,7 +70,11 @@ public class RegistroReserva extends MantenimientoBase {
 
     form.add(new JLabel("Observación")); form.add(txtObs);
 
-    contenedor.add(form, BorderLayout.NORTH);
+    JScrollPane scrollForm = new JScrollPane(form);
+scrollForm.setPreferredSize(new Dimension(600, 220));
+scrollForm.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+contenedor.add(scrollForm, BorderLayout.NORTH);
 
     // ===== TABLA ABAJO =====
     modelo.setColumnIdentifiers(new String[]{

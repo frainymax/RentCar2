@@ -246,18 +246,16 @@ public class MenuAdmin extends javax.swing.JFrame {
     private void itemOfertasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemOfertasActionPerformed
         // TODO add your handling code here:
         
-        itemOfertas.addActionListener(e -> {
+                                                  
     new RegistroOferta(this).setVisible(true);
     this.setVisible(false);
-});
+
     }//GEN-LAST:event_itemOfertasActionPerformed
 
     private void itemClientesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemClientesActionPerformed
         // TODO add your handling code here:
-        itemClientes.addActionListener(e -> {
-    new RegistroCliente(this).setVisible(true);
+   new RegistroCliente(this).setVisible(true);
     this.setVisible(false);
-});
     }//GEN-LAST:event_itemClientesActionPerformed
 
     private void itemReservasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemReservasActionPerformed
