@@ -33,19 +33,25 @@ public class RegistroCliente extends MantenimientoBase {
 
         JPanel contenedor = new JPanel(new BorderLayout());
 
-        JPanel f = new JPanel(new GridLayout(6,2,5,5));
+        JPanel f = new JPanel(new GridLayout(6, 2, 5, 5));
 
-        f.add(new JLabel("Cédula")); f.add(txtCedula);
-        f.add(new JLabel("Nombre")); f.add(txtNombre);
-        f.add(new JLabel("Apellido")); f.add(txtApellido);
-        f.add(new JLabel("Dirección")); f.add(txtDireccion);
-        f.add(new JLabel("Email")); f.add(txtEmail);
-        f.add(new JLabel("Teléfono")); f.add(txtTelefono);
+        f.add(new JLabel("Cédula"));
+        f.add(txtCedula);
+        f.add(new JLabel("Nombre"));
+        f.add(txtNombre);
+        f.add(new JLabel("Apellido"));
+        f.add(txtApellido);
+        f.add(new JLabel("Dirección"));
+        f.add(txtDireccion);
+        f.add(new JLabel("Email"));
+        f.add(txtEmail);
+        f.add(new JLabel("Teléfono"));
+        f.add(txtTelefono);
 
         contenedor.add(f, BorderLayout.NORTH);
 
         modelo.setColumnIdentifiers(new String[]{
-                "Cedula","Nombre","Apellido","Telefono"
+            "Cedula", "Nombre", "Apellido", "Telefono"
         });
 
         tabla.setModel(modelo);
@@ -74,13 +80,14 @@ public class RegistroCliente extends MantenimientoBase {
                     txtEmail.setText(c.getEmail());
                     txtTelefono.setText(c.getTelefono());
 
-                    estadoModificar(); // 🔥 CLAVE
+                    estadoModificar();  
                 } else {
                     original = "";
-                    estadoNuevo(); // 🔥 CLAVE
+                    estadoNuevo();  
                 }
 
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         });
 
         // CLICK TABLA
@@ -99,18 +106,18 @@ public class RegistroCliente extends MantenimientoBase {
 
             for (Cliente c : dao.listar()) {
                 modelo.addRow(new Object[]{
-                        c.getCedula(),
-                        c.getNombre(),
-                        c.getApellido(),
-                        c.getTelefono()
+                    c.getCedula(),
+                    c.getNombre(),
+                    c.getApellido(),
+                    c.getTelefono()
                 });
             }
 
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 
     // ================= MANTENIMIENTO BASE =================
-
     @Override
     protected void limpiarCampos() {
         txtCedula.setText("");
@@ -138,17 +145,20 @@ public class RegistroCliente extends MantenimientoBase {
             return false;
         }
 
-        // VALIDAR NUMEROS
-        try {
-            Integer.parseInt(txtCedula.getText());
-            Integer.parseInt(txtTelefono.getText());
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Cédula y Teléfono deben ser números");
-            return false;
-        }
+        // VALIDAR CÉDULA
+if (!txtCedula.getText().matches("\\d+")) {
+    JOptionPane.showMessageDialog(this, "Cédula debe ser numérica");
+    return false;
+}
 
+// VALIDAR TELÉFONO
+if (!txtTelefono.getText().matches("\\d+")) {
+    JOptionPane.showMessageDialog(this, "Teléfono debe ser numérico");
+    return false;
+}
         return true;
     }
+
 
     @Override
     protected void guardarRegistro() {
