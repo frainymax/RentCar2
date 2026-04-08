@@ -63,42 +63,49 @@ public class RegistroCliente extends MantenimientoBase {
         cargarTabla();
     }
 
-    // ================= EVENTOS =================
-    private void eventos() {
+   private void eventos() {
 
-        // ===== VALIDAR CÉDULA =====
-        txtCedula.addActionListener(e -> {
-            try {
-                Cliente c = dao.buscar(txtCedula.getText().trim());
+    // ===== CÉDULA (BUSCAR + MOVER) =====
+    txtCedula.addActionListener(e -> {
+        try {
+            Cliente c = dao.buscar(txtCedula.getText().trim());
 
-                if (c != null) {
-                    original = c.getCedula();
+            if (c != null) {
+                original = c.getCedula();
 
-                    txtNombre.setText(c.getNombre());
-                    txtApellido.setText(c.getApellido());
-                    txtDireccion.setText(c.getDireccion());
-                    txtEmail.setText(c.getEmail());
-                    txtTelefono.setText(c.getTelefono());
+                txtNombre.setText(c.getNombre());
+                txtApellido.setText(c.getApellido());
+                txtDireccion.setText(c.getDireccion());
+                txtEmail.setText(c.getEmail());
+                txtTelefono.setText(c.getTelefono());
 
-                    estadoModificar();  
-                } else {
-                    original = "";
-                    estadoNuevo();  
-                }
-
-            } catch (Exception ignored) {
+                estadoModificar();
+            } else {
+                original = "";
+                estadoNuevo();
             }
-        });
 
-        // CLICK TABLA
-        tabla.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                int fila = tabla.getSelectedRow();
-                txtCedula.setText(modelo.getValueAt(fila, 0).toString());
-                txtCedula.postActionEvent();
-            }
-        });
-    }
+        } catch (Exception ignored) {}
+
+        txtNombre.requestFocus(); // 👈 MOVER AL SIGUIENTE
+    });
+
+    // ===== NAVEGACIÓN CON ENTER =====
+    txtNombre.addActionListener(e -> txtApellido.requestFocus());
+    txtApellido.addActionListener(e -> txtDireccion.requestFocus());
+    txtDireccion.addActionListener(e -> txtEmail.requestFocus());
+    txtEmail.addActionListener(e -> txtTelefono.requestFocus());
+    txtTelefono.addActionListener(e -> guardarRegistro()); // opcional
+
+    // ===== CLICK TABLA =====
+    tabla.addMouseListener(new java.awt.event.MouseAdapter() {
+        public void mouseClicked(java.awt.event.MouseEvent evt) {
+            int fila = tabla.getSelectedRow();
+            txtCedula.setText(modelo.getValueAt(fila, 0).toString());
+            txtCedula.postActionEvent();
+        }
+    });
+}
 
     private void cargarTabla() {
         try {
@@ -146,19 +153,18 @@ public class RegistroCliente extends MantenimientoBase {
         }
 
         // VALIDAR CÉDULA
-if (!txtCedula.getText().matches("\\d+")) {
-    JOptionPane.showMessageDialog(this, "Cédula debe ser numérica");
-    return false;
-}
+        if (!txtCedula.getText().matches("\\d+")) {
+            JOptionPane.showMessageDialog(this, "Cédula debe ser numérica");
+            return false;
+        }
 
 // VALIDAR TELÉFONO
-if (!txtTelefono.getText().matches("\\d+")) {
-    JOptionPane.showMessageDialog(this, "Teléfono debe ser numérico");
-    return false;
-}
+        if (!txtTelefono.getText().matches("\\d+")) {
+            JOptionPane.showMessageDialog(this, "Teléfono debe ser numérico");
+            return false;
+        }
         return true;
     }
-
 
     @Override
     protected void guardarRegistro() {

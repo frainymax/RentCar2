@@ -18,7 +18,7 @@ public class ClienteDAO {
             f.createNewFile();
 
             BufferedWriter bw = new BufferedWriter(new FileWriter(f));
-            bw.write("cedula,nombre,apellido,direccion,email,telefono");
+            bw.write("cedula;nombre;apellido;direccion;email;telefono"); // 👈 CAMBIADO
             bw.newLine();
             bw.close();
         }
@@ -33,7 +33,7 @@ public class ClienteDAO {
 
         String l;
         while ((l = br.readLine()) != null) {
-            String[] d = l.split(",", -1);
+            String[] d = l.split(";", -1); // 👈 CAMBIADO
 
             if (d[0].equals(cedula)) {
                 br.close();
@@ -60,7 +60,7 @@ public class ClienteDAO {
 
         String l;
         while ((l = br.readLine()) != null) {
-            if (l.split(",")[0].equals(original)) {
+            if (l.split(";")[0].equals(original)) { // 👈 CAMBIADO
                 lineas.add(c.toString());
                 actualizado = true;
             } else {
@@ -74,11 +74,11 @@ public class ClienteDAO {
         }
 
         BufferedWriter bw = new BufferedWriter(new FileWriter(RUTA, false));
-        bw.write(enc); 
+        bw.write(enc);
         bw.newLine();
 
         for (String s : lineas) {
-            bw.write(s); 
+            bw.write(s);
             bw.newLine();
         }
 
@@ -96,18 +96,18 @@ public class ClienteDAO {
 
         String l;
         while ((l = br.readLine()) != null) {
-            if (!l.split(",")[0].equals(cedula)) {
+            if (!l.split(";")[0].equals(cedula)) { // 👈 CAMBIADO
                 lineas.add(l);
             }
         }
         br.close();
 
         BufferedWriter bw = new BufferedWriter(new FileWriter(RUTA, false));
-        bw.write(enc); 
+        bw.write(enc);
         bw.newLine();
 
         for (String s : lineas) {
-            bw.write(s); 
+            bw.write(s);
             bw.newLine();
         }
 
@@ -125,7 +125,7 @@ public class ClienteDAO {
 
         String l;
         while ((l = br.readLine()) != null) {
-            String[] d = l.split(",", -1);
+            String[] d = l.split(";", -1); // 👈 CAMBIADO
 
             lista.add(new Cliente(
                     d[0], d[1], d[2],

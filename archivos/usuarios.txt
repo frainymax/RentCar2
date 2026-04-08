@@ -1,3 +1,4 @@
 login,pass,nivel,nombre,apellido,email
 frailin,123,0,Frailin,Almonte,lapara@aaa.ddd
 sinforosa,123,1,lapara,de la pieza,aaa@aaa.aaa
+fmj,1234,1,fausto,Martinez,fmj@gmail.com

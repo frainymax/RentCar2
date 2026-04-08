@@ -28,8 +28,8 @@ public class Cliente {
     public String getTelefono() { return telefono; }
 
     @Override
-    public String toString() {
-        return cedula + "," + nombre + "," + apellido + "," +
-               direccion + "," + email + "," + telefono;
-    }
+public String toString() {
+    return cedula + ";" + nombre + ";" + apellido + ";" +
+           direccion + ";" + email + ";" + telefono;
+}
 }

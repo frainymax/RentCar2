@@ -1,4 +1,5 @@
 matricula,marca,modelo,tipoVeh,tipoMotor,gama,desc,techo,aire,cuero,color,auto,status
 214,toyota,lapara,1,1,3,alta,true,true,false,amarillo,false,true
-1234,Sonata,2324,1,1,1,baja,false,true,true,mamen,false,true
-A123,TOYOTA,COROLLA,0,0,1,Economico,true,true,false,blanco,true,false
+1234,Sonata,2324,1,1,1,Economico( basica),false,true,true,mamen,false,true
+A123,TOYOTA,COROLLA,0,0,2,media,true,true,false,blanco,true,false
+3234234,LAPARA,666,1,1,2,media,false,false,true,RUSTICO,false,true

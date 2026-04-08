@@ -14,24 +14,21 @@ import java.awt.*;
 public class RegistroOferta extends MantenimientoBase {
 
     private GamaDAO gamaDAO = new GamaDAO();
-
     private OfertaDAO dao = new OfertaDAO();
     private VehiculoDAO vehiculoDAO = new VehiculoDAO();
     private String original = "";
     private MenuAdmin menu;
 
-    // ===== CAMPOS =====
     JTextField txtId = new JTextField(10);
     JTextField txtMatricula = new JTextField(10);
     JTextField txtDescripcion = new JTextField(10);
-    JTextField txtPrecio = new JTextField(10);
+    JTextField txtPrecio = new JTextField(10); // % descuento
 
-    // DATOS AUTOMÁTICOS DEL VEHÍCULO
     JTextField txtMarca = new JTextField(10);
     JTextField txtModelo = new JTextField(10);
     JTextField txtPrecioGama = new JTextField(10);
+    JTextField txtPrecioFinal = new JTextField(10); // 👈 NUEVO
 
-    // TABLA
     private JTable tabla = new JTable();
     private DefaultTableModel modelo = new DefaultTableModel();
 
@@ -43,7 +40,7 @@ public class RegistroOferta extends MantenimientoBase {
 
         JPanel contenedor = new JPanel(new BorderLayout());
 
-        JPanel f = new JPanel(new GridLayout(7, 2, 5, 5));
+        JPanel f = new JPanel(new GridLayout(8, 2, 5, 5));
 
         f.add(new JLabel("Id Oferta"));
         f.add(txtId);
@@ -57,18 +54,21 @@ public class RegistroOferta extends MantenimientoBase {
         f.add(txtPrecioGama);
         f.add(new JLabel("Descripción"));
         f.add(txtDescripcion);
-        f.add(new JLabel("Precio Oferta"));
+        f.add(new JLabel("Descuento (%)"));
         f.add(txtPrecio);
+        f.add(new JLabel("Precio Final")); // 👈 NUEVO
+        f.add(txtPrecioFinal);
 
-        // campos automáticos bloqueados
         txtMarca.setEnabled(false);
         txtModelo.setEnabled(false);
         txtPrecioGama.setEnabled(false);
+        txtPrecioFinal.setEnabled(false);
+        txtPrecioFinal.setBackground(Color.LIGHT_GRAY);
 
         contenedor.add(f, BorderLayout.NORTH);
 
         modelo.setColumnIdentifiers(new String[]{
-            "ID", "Matricula", "Descripcion", "Precio"
+                "ID", "Matricula", "Descripcion", "Precio Final"
         });
 
         tabla.setModel(modelo);
@@ -80,7 +80,6 @@ public class RegistroOferta extends MantenimientoBase {
         cargarTabla();
     }
 
-    // ================= EVENTOS =================
     private void eventos() {
 
         // ===== BUSCAR OFERTA =====
@@ -93,21 +92,30 @@ public class RegistroOferta extends MantenimientoBase {
 
                     txtMatricula.setText(o.getMatricula());
                     txtDescripcion.setText(o.getDescripcion());
-                    txtPrecio.setText(String.valueOf(o.getPrecio()));
+
+                    txtPrecioFinal.setText(String.valueOf(o.getPrecio())); // 👈 correcto
+                    txtPrecio.setText(""); // 👈 evitar confusión
 
                     buscarVehiculo();
+                    JOptionPane.showMessageDialog(this, "Modificando");
                     estadoModificar();
                 } else {
                     original = "";
+                    JOptionPane.showMessageDialog(this, "Creando");
                     estadoNuevo();
                 }
 
-            } catch (Exception ignored) {
-            }
+            } catch (Exception ignored) {}
         });
 
         // ===== BUSCAR VEHÍCULO =====
-        txtMatricula.addActionListener(e -> buscarVehiculo());
+        txtMatricula.addActionListener(e -> {
+            buscarVehiculo();
+            txtDescripcion.requestFocus();
+        });
+
+        // ===== CALCULAR PRECIO =====
+        txtPrecio.addActionListener(e -> calcularPrecioFinal());
 
         // ===== CLICK TABLA =====
         tabla.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -119,6 +127,26 @@ public class RegistroOferta extends MantenimientoBase {
         });
     }
 
+    private void calcularPrecioFinal() {
+        try {
+            double porcentaje = Double.parseDouble(txtPrecio.getText());
+            double precioGama = Double.parseDouble(txtPrecioGama.getText());
+
+            if (porcentaje <= 0 || porcentaje > 100) {
+                txtPrecioFinal.setText("");
+                return;
+            }
+
+            double descuento = precioGama * (porcentaje / 100);
+            double precioFinal = precioGama - descuento;
+
+            txtPrecioFinal.setText(String.valueOf(precioFinal));
+
+        } catch (Exception e) {
+            txtPrecioFinal.setText("");
+        }
+    }
+
     private void buscarVehiculo() {
         try {
             Vehiculo v = vehiculoDAO.buscar(txtMatricula.getText());
@@ -126,16 +154,19 @@ public class RegistroOferta extends MantenimientoBase {
             if (v != null) {
                 txtMarca.setText(v.getMarca());
                 txtModelo.setText(v.getModelo());
-                Gama g = gamaDAO.buscarPorId(v.getGama());
 
+                Gama g = gamaDAO.buscarPorId(v.getGama());
                 if (g != null) {
                     txtPrecioGama.setText(String.valueOf(g.getPrecio()));
                 }
+
+                calcularPrecioFinal(); // 👈 recalcula si ya hay %
 
             } else {
                 txtMarca.setText("");
                 txtModelo.setText("");
                 txtPrecioGama.setText("");
+                txtPrecioFinal.setText("");
                 JOptionPane.showMessageDialog(this, "Matrícula no existe");
             }
 
@@ -150,18 +181,16 @@ public class RegistroOferta extends MantenimientoBase {
 
             for (Oferta o : dao.listar()) {
                 modelo.addRow(new Object[]{
-                    o.getId(),
-                    o.getMatricula(),
-                    o.getDescripcion(),
-                    o.getPrecio()
+                        o.getId(),
+                        o.getMatricula(),
+                        o.getDescripcion(),
+                        o.getPrecio()
                 });
             }
 
-        } catch (Exception ignored) {
-        }
+        } catch (Exception ignored) {}
     }
 
-    // ================= MANTENIMIENTO BASE =================
     @Override
     protected void limpiarCampos() {
         txtId.setText("");
@@ -171,6 +200,7 @@ public class RegistroOferta extends MantenimientoBase {
         txtMarca.setText("");
         txtModelo.setText("");
         txtPrecioGama.setText("");
+        txtPrecioFinal.setText("");
 
         original = "";
         cargarTabla();
@@ -188,16 +218,25 @@ public class RegistroOferta extends MantenimientoBase {
             return false;
         }
 
-        // validar número
         try {
             Integer.parseInt(txtId.getText());
-            Double.parseDouble(txtPrecio.getText());
+            double porcentaje = Double.parseDouble(txtPrecio.getText());
+
+            if (porcentaje < 15) {
+                JOptionPane.showMessageDialog(this, "Mínimo 15%");
+                return false;
+            }
+
+            if (porcentaje > 100) {
+                JOptionPane.showMessageDialog(this, "Máximo 100%");
+                return false;
+            }
+
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "ID entero y Precio decimal");
+            JOptionPane.showMessageDialog(this, "Datos inválidos");
             return false;
         }
 
-        // validar vehículo existe
         try {
             Vehiculo v = vehiculoDAO.buscar(txtMatricula.getText());
             if (v == null) {
@@ -208,21 +247,6 @@ public class RegistroOferta extends MantenimientoBase {
             return false;
         }
 
-        // validar 15%
-        try {
-            double precioOferta = Double.parseDouble(txtPrecio.getText());
-            double precioGama = Double.parseDouble(txtPrecioGama.getText());
-
-            if (precioOferta < (precioGama * 0.15)) {
-                JOptionPane.showMessageDialog(this, "Precio oferta menor al 15%");
-                return false;
-            }
-
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error en precios");
-            return false;
-        }
-
         return true;
     }
 
@@ -230,15 +254,21 @@ public class RegistroOferta extends MantenimientoBase {
     protected void guardarRegistro() {
         try {
 
+            double porcentaje = Double.parseDouble(txtPrecio.getText());
+            double precioGama = Double.parseDouble(txtPrecioGama.getText());
+
+            double descuento = precioGama * (porcentaje / 100);
+            double precioFinal = precioGama - descuento;
+
             Oferta o = new Oferta(
                     txtId.getText(),
                     txtMatricula.getText(),
                     txtDescripcion.getText(),
-                    Double.parseDouble(txtPrecio.getText())
+                    precioFinal
             );
 
             dao.guardar(o, original);
-            JOptionPane.showMessageDialog(this, "Oferta guardada");
+            JOptionPane.showMessageDialog(this, "Guardado. Precio final: " + precioFinal);
 
             limpiarCampos();
 
@@ -257,6 +287,7 @@ public class RegistroOferta extends MantenimientoBase {
             JOptionPane.showMessageDialog(this, "Error al eliminar");
         }
     }
+    
 
     @Override
     protected void volver() {

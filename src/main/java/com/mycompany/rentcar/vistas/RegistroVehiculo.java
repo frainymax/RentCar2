@@ -9,9 +9,8 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
-
-
 public class RegistroVehiculo extends MantenimientoBase {
+
     private boolean chkTocado = false;
 
     private VehiculoDAO dao = new VehiculoDAO();
@@ -37,33 +36,49 @@ public class RegistroVehiculo extends MantenimientoBase {
     JCheckBox chkAire = new JCheckBox("Aire");
     JCheckBox chkCuero = new JCheckBox("Cuero");
     JCheckBox chkAuto = new JCheckBox("Automático");
-    JCheckBox chkStatus = new JCheckBox("Disponible");
+    JCheckBox chkStatus = new JCheckBox("Disponible", true);
 
     public RegistroVehiculo(MenuAdmin m) {
         super();
+
         this.menu = m;
+        txtDescGama.setEditable(false);
+        txtPrecioGama.setEditable(false);
+        txtDescGama.setBackground(Color.LIGHT_GRAY);
+        txtPrecioGama.setBackground(Color.LIGHT_GRAY);
 
         JPanel contenedor = new JPanel(new BorderLayout());
 
         JPanel f = new JPanel(new GridLayout(12, 2, 5, 5));
 
-        f.add(new JLabel("Matricula")); f.add(txtMat);
-        f.add(new JLabel("Marca")); f.add(txtMarca);
-        f.add(new JLabel("Modelo")); f.add(txtModelo);
-        f.add(new JLabel("Tipo Vehículo")); f.add(cmbTipoVeh);
-        f.add(new JLabel("Tipo Motor")); f.add(cmbMotor);
-        f.add(new JLabel("Gama")); f.add(txtGama);
-        f.add(new JLabel("Desc Gama")); f.add(txtDescGama);
-        f.add(new JLabel("Precio Gama")); f.add(txtPrecioGama);
-        f.add(new JLabel("Color")); f.add(txtColor);
-        f.add(chkTecho); f.add(chkAire);
-        f.add(chkCuero); f.add(chkAuto);
+        f.add(new JLabel("Matricula"));
+        f.add(txtMat);
+        f.add(new JLabel("Marca"));
+        f.add(txtMarca);
+        f.add(new JLabel("Modelo"));
+        f.add(txtModelo);
+        f.add(new JLabel("Tipo Vehículo"));
+        f.add(cmbTipoVeh);
+        f.add(new JLabel("Tipo Motor"));
+        f.add(cmbMotor);
+        f.add(new JLabel("Gama"));
+        f.add(txtGama);
+        f.add(new JLabel("Desc Gama"));
+        f.add(txtDescGama);
+        f.add(new JLabel("Precio Gama"));
+        f.add(txtPrecioGama);
+        f.add(new JLabel("Color"));
+        f.add(txtColor);
+        f.add(chkTecho);
+        f.add(chkAire);
+        f.add(chkCuero);
+        f.add(chkAuto);
         f.add(chkStatus);
 
         contenedor.add(f, BorderLayout.NORTH);
 
         modelo.setColumnIdentifiers(new String[]{
-                "Matricula", "Marca", "Modelo", "Gama", "Color", "Status"
+            "Matricula", "Marca", "Modelo", "Gama", "Color", "Status"
         });
 
         tabla.setModel(modelo);
@@ -82,6 +97,17 @@ public class RegistroVehiculo extends MantenimientoBase {
         txtMat.addActionListener(e -> buscarVehiculo());
         txtGama.addActionListener(e -> buscarGama());
 
+        txtMat.addActionListener(e -> txtMarca.requestFocus());
+        txtMarca.addActionListener(e -> txtModelo.requestFocus());
+        txtModelo.addActionListener(e -> cmbTipoVeh.requestFocus());
+        cmbTipoVeh.addActionListener(e -> cmbMotor.requestFocus());
+        cmbMotor.addActionListener(e -> txtGama.requestFocus());
+        txtGama.addActionListener(e -> {
+            buscarGama();
+            txtColor.requestFocus();
+        });
+        txtColor.addActionListener(e -> chkTecho.requestFocus());
+
         tabla.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 int fila = tabla.getSelectedRow();
@@ -90,30 +116,28 @@ public class RegistroVehiculo extends MantenimientoBase {
             }
         });
         chkTecho.addActionListener(e -> chkTocado = true);
-chkAire.addActionListener(e -> chkTocado = true);
-chkCuero.addActionListener(e -> chkTocado = true);
-chkAuto.addActionListener(e -> chkTocado = true);
+        chkAire.addActionListener(e -> chkTocado = true);
+        chkCuero.addActionListener(e -> chkTocado = true);
+        chkAuto.addActionListener(e -> chkTocado = true);
     }
-    
-    
 
-   private void buscarGama() {
-    try {
-        Gama g = gamaDAO.buscarPorId(txtGama.getText().trim());
+    private void buscarGama() {
+        try {
+            Gama g = gamaDAO.buscarPorId(txtGama.getText().trim());
 
-        if (g != null) {
-            txtDescGama.setText(g.getDescripcion());
-            txtPrecioGama.setText(String.valueOf(g.getPrecio()));
-        } else {
-            txtDescGama.setText("");
-            txtPrecioGama.setText("");
-            JOptionPane.showMessageDialog(this, "Id Gama no existe");
+            if (g != null) {
+                txtDescGama.setText(g.getDescripcion());
+                txtPrecioGama.setText(String.valueOf(g.getPrecio()));
+            } else {
+                txtDescGama.setText("");
+                txtPrecioGama.setText("");
+                JOptionPane.showMessageDialog(this, "Id Gama no existe");
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error buscando Gama");
         }
-
-    } catch (Exception e) {
-        JOptionPane.showMessageDialog(this, "Error buscando Gama");
     }
-}
 
     private void buscarVehiculo() {
         try {
@@ -137,11 +161,13 @@ chkAuto.addActionListener(e -> chkTocado = true);
                 chkStatus.setSelected(v.isStatus());
 
                 buscarGama();
+                chkTocado = true;
                 estadoModificar();
             } else {
                 estadoNuevo();
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 
     private void cargarTabla() {
@@ -149,15 +175,16 @@ chkAuto.addActionListener(e -> chkTocado = true);
             modelo.setRowCount(0);
             for (Vehiculo v : dao.listar()) {
                 modelo.addRow(new Object[]{
-                        v.getMatricula(),
-                        v.getMarca(),
-                        v.getModelo(),
-                        v.getGama(),
-                        v.getColor(),
-                        v.isStatus()
+                    v.getMatricula(),
+                    v.getMarca(),
+                    v.getModelo(),
+                    v.getGama(),
+                    v.getColor(),
+                    v.isStatus()
                 });
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 
     @Override
@@ -174,44 +201,44 @@ chkAuto.addActionListener(e -> chkTocado = true);
         chkAire.setSelected(false);
         chkCuero.setSelected(false);
         chkAuto.setSelected(false);
-        chkStatus.setSelected(false);
+        chkStatus.setSelected(true);
 
         original = "";
         chkTocado = false;
         cargarTabla();
-        
+
     }
 
     @Override
- 
-protected boolean validarCampos() {
 
-    if (txtMat.getText().isEmpty()
-            || txtMarca.getText().isEmpty()
-            || txtModelo.getText().isEmpty()
-            || txtGama.getText().isEmpty()
-            || txtColor.getText().isEmpty()) {
+    protected boolean validarCampos() {
 
-        JOptionPane.showMessageDialog(this, "Campos obligatorios vacíos");
-        return false;
-    }
+        if (txtMat.getText().isEmpty()
+                || txtMarca.getText().isEmpty()
+                || txtModelo.getText().isEmpty()
+                || txtGama.getText().isEmpty()
+                || txtColor.getText().isEmpty()) {
 
-    if (!chkTocado) {
-        JOptionPane.showMessageDialog(this, "Debe seleccionar las características del vehículo (checks)");
-        return false;
-    }
-
-    try {
-        if (gamaDAO.buscarPorId(txtGama.getText().trim()) == null) {
-            JOptionPane.showMessageDialog(this, "Id Gama no existe");
+            JOptionPane.showMessageDialog(this, "Campos obligatorios vacíos");
             return false;
         }
-    } catch (Exception e) {
-        return false;
-    }
 
-    return true;
-}
+        if (!chkTocado) {
+            JOptionPane.showMessageDialog(this, "Debe seleccionar las características del vehículo (checks)");
+            return false;
+        }
+
+        try {
+            if (gamaDAO.buscarPorId(txtGama.getText().trim()) == null) {
+                JOptionPane.showMessageDialog(this, "Id Gama no existe");
+                return false;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+
+        return true;
+    }
 
     @Override
     protected void guardarRegistro() {
