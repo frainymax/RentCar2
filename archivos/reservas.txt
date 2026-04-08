@@ -1,2 +1,2 @@
 matricula,cedula,oferta,fechaReserva,fechaSalida,fechaEntrada,observacion,dias,total
-A123,123,1,2026-04-08,2026-04-10,2026-04-12,EJEMPLO,2,3400.0
+A123,123,1,2026-04-08,2026-04-10,2026-04-12,LA PARA,2,1700.0

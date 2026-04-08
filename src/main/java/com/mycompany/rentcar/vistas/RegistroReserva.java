@@ -37,7 +37,12 @@ public class RegistroReserva extends MantenimientoBase {
     JLabel lblEstado = new JLabel("Creando");
 
     private JTable tabla = new JTable();
-    private DefaultTableModel modelo = new DefaultTableModel();
+    private DefaultTableModel modelo = new DefaultTableModel() {
+    @Override
+    public boolean isCellEditable(int row, int column) {
+        return false; // 🔥 DESACTIVA EDICIÓN TOTAL
+    }
+};
 
    public RegistroReserva(MenuAdmin m) {
     super();
@@ -115,6 +120,27 @@ contenedor.add(scrollForm, BorderLayout.NORTH);
 
     private void eventos(){
 
+        
+        txtOferta.addActionListener(e -> {
+    try {
+        if (!txtOferta.getText().isEmpty()) {
+
+            Oferta o = ofertaDAO.buscar(txtOferta.getText());
+
+            if (o != null) {
+                JOptionPane.showMessageDialog(this, "Oferta válida");
+                 
+            } else {
+                JOptionPane.showMessageDialog(this, "Oferta no existe");
+                txtOferta.setText("");
+                txtTotal.setText("");
+            }
+        }
+
+    } catch (Exception ex) {
+        JOptionPane.showMessageDialog(this, "Error buscando oferta");
+    }
+});
         txtMatricula.addActionListener(e -> {
             try{
                 Vehiculo v = vehiculoDAO.buscar(txtMatricula.getText());
