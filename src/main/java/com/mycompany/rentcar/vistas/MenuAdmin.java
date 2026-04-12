@@ -134,6 +134,11 @@ public class MenuAdmin extends javax.swing.JFrame {
         menuMovimiento.add(itemReservas);
 
         itemRecepcion.setText("Recepcion Vehiculos");
+        itemRecepcion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itemRecepcionActionPerformed(evt);
+            }
+        });
         menuMovimiento.add(itemRecepcion);
 
         jMenuBar1.add(menuMovimiento);
@@ -263,6 +268,12 @@ public class MenuAdmin extends javax.swing.JFrame {
         new RegistroReserva(this).setVisible(true);
 this.setVisible(false);
     }//GEN-LAST:event_itemReservasActionPerformed
+
+    private void itemRecepcionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemRecepcionActionPerformed
+        // TODO add your handling code here:
+        new RegistroRecepcion(this).setVisible(true);
+this.setVisible(false);
+    }//GEN-LAST:event_itemRecepcionActionPerformed
 
     /**
      * @param args the command line arguments

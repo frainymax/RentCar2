@@ -19,7 +19,7 @@ public class GamaDAO {
             archivo.createNewFile();
 
             BufferedWriter bw = new BufferedWriter(new FileWriter(archivo));
-            bw.write("id,descripcion,precio");
+            bw.write("id;descripcion;precio"); // 🔴 CAMBIADO
             bw.newLine();
             bw.close();
         }
@@ -34,7 +34,7 @@ public class GamaDAO {
 
         String linea;
         while ((linea = br.readLine()) != null) {
-            String[] d = linea.split(",", -1);
+            String[] d = linea.split(";", -1); // 🔴 CAMBIADO
 
             if (d[0].equals(id)) {
                 br.close();
@@ -63,7 +63,7 @@ public class GamaDAO {
 
         String linea;
         while ((linea = br.readLine()) != null) {
-            String[] d = linea.split(",", -1);
+            String[] d = linea.split(";", -1); // 🔴 CAMBIADO
 
             if (d[0].equals(idOriginal)) {
                 lineas.add(nueva.toString());
@@ -102,7 +102,7 @@ public class GamaDAO {
 
         String linea;
         while ((linea = br.readLine()) != null) {
-            String[] d = linea.split(",", -1);
+            String[] d = linea.split(";", -1); // 🔴 CAMBIADO
 
             if (!d[0].equals(id)) {
                 lineas.add(linea);
@@ -133,7 +133,7 @@ public class GamaDAO {
 
         String linea;
         while ((linea = br.readLine()) != null) {
-            String[] d = linea.split(",", -1);
+            String[] d = linea.split(";", -1); // 🔴 CAMBIADO
 
             lista.add(new Gama(
                     d[0],

@@ -15,7 +15,6 @@ public class Vehiculo {
     private String color;
     private boolean automatico;
     private boolean status;
-    
 
     public Vehiculo(String matricula, String marca, String modelo,
                     int tipoVehiculo, int tipoMotor, String gama,
@@ -38,7 +37,6 @@ public class Vehiculo {
         this.status = status;
     }
 
-    // ===== GETTERS NECESARIOS =====
     public String getMatricula() { return matricula; }
     public String getMarca() { return marca; }
     public String getModelo() { return modelo; }
@@ -52,17 +50,17 @@ public class Vehiculo {
     public String getColor() { return color; }
     public boolean isAutomatico() { return automatico; }
     public boolean isStatus() { return status; }
-    
+
     public void setStatus(boolean status) {
-    this.status = status;
-}
+        this.status = status;
+    }
 
     @Override
     public String toString() {
-        return matricula + "," + marca + "," + modelo + "," +
-                tipoVehiculo + "," + tipoMotor + "," + gama + "," +
-                descripcionGama + "," +
-                techo + "," + aire + "," + cuero + "," +
-                color + "," + automatico + "," + status;
+        return matricula + ";" + marca + ";" + modelo + ";" +
+                tipoVehiculo + ";" + tipoMotor + ";" + gama + ";" +
+                descripcionGama + ";" +
+                techo + ";" + aire + ";" + cuero + ";" +
+                color + ";" + automatico + ";" + status;
     }
 }

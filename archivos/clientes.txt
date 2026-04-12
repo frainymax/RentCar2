@@ -1,2 +1,2 @@
-cedula,nombre,apellido,direccion,email,telefono
-123;Juan;Perez;Calle 9, casa #8 , los quemados;sdlifjsad@sldfjasd.fff;8494363077
+cedula;nombre;apellido;direccion;email;telefono
+123;Juan;Perez;calle #9, casa #18, los quemados;lapara@gmail.com;8494363077

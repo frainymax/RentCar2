@@ -18,7 +18,7 @@ public class OfertaDAO {
             f.createNewFile();
 
             BufferedWriter bw = new BufferedWriter(new FileWriter(f));
-            bw.write("id,matricula,descripcion,precio");
+            bw.write("id;matricula;descripcion;precio"); // 🔴 CAMBIADO
             bw.newLine();
             bw.close();
         }
@@ -33,7 +33,7 @@ public class OfertaDAO {
 
         String l;
         while ((l = br.readLine()) != null) {
-            String[] d = l.split(",", -1);
+            String[] d = l.split(";", -1); // 🔴 CAMBIADO
 
             if (d[0].equals(id)) {
                 br.close();
@@ -62,7 +62,7 @@ public class OfertaDAO {
 
         String l;
         while ((l = br.readLine()) != null) {
-            if (l.split(",")[0].equals(original)) {
+            if (l.split(";")[0].equals(original)) { // 🔴 CAMBIADO
                 lineas.add(o.toString());
                 actualizado = true;
             } else {
@@ -98,7 +98,7 @@ public class OfertaDAO {
 
         String l;
         while ((l = br.readLine()) != null) {
-            if (!l.split(",")[0].equals(id)) {
+            if (!l.split(";")[0].equals(id)) { // 🔴 CAMBIADO
                 lineas.add(l);
             }
         }
@@ -127,7 +127,7 @@ public class OfertaDAO {
 
         String l;
         while ((l = br.readLine()) != null) {
-            String[] d = l.split(",", -1);
+            String[] d = l.split(";", -1); // 🔴 CAMBIADO
 
             lista.add(new Oferta(
                     d[0],

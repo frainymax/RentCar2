@@ -21,6 +21,6 @@ public class Oferta {
 
     @Override
     public String toString() {
-        return id + "," + matricula + "," + descripcion + "," + precio;
+        return id + ";" + matricula + ";" + descripcion + ";" + precio;
     }
 }

@@ -68,7 +68,7 @@ public class RegistroOferta extends MantenimientoBase {
         contenedor.add(f, BorderLayout.NORTH);
 
         modelo.setColumnIdentifiers(new String[]{
-                "ID", "Matricula", "Descripcion", "Precio Final"
+            "ID", "Matricula", "Descripcion", "Precio Final"
         });
 
         tabla.setModel(modelo);
@@ -105,7 +105,8 @@ public class RegistroOferta extends MantenimientoBase {
                     estadoNuevo();
                 }
 
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         });
 
         // ===== BUSCAR VEHÍCULO =====
@@ -127,25 +128,37 @@ public class RegistroOferta extends MantenimientoBase {
         });
     }
 
-    private void calcularPrecioFinal() {
-        try {
-            double porcentaje = Double.parseDouble(txtPrecio.getText());
-            double precioGama = Double.parseDouble(txtPrecioGama.getText());
+  private void calcularPrecioFinal() {
+    try {
+        double porcentaje = Double.parseDouble(txtPrecio.getText());
+        double precioGama = Double.parseDouble(txtPrecioGama.getText());
 
-            if (porcentaje <= 0 || porcentaje > 100) {
-                txtPrecioFinal.setText("");
-                return;
-            }
-
-            double descuento = precioGama * (porcentaje / 100);
-            double precioFinal = precioGama - descuento;
-
-            txtPrecioFinal.setText(String.valueOf(precioFinal));
-
-        } catch (Exception e) {
+        // 🔴 VALIDACIÓN (modo profe)
+        if (porcentaje > 15) {
+            JOptionPane.showMessageDialog(this, "Máximo 15%");
             txtPrecioFinal.setText("");
+            txtPrecio.setText("");
+            txtPrecio.requestFocus();
+            return;
         }
+
+        if (porcentaje <= 0) {
+            JOptionPane.showMessageDialog(this, "Debe ser mayor que 0%");
+            txtPrecioFinal.setText("");
+            txtPrecio.setText("");
+            txtPrecio.requestFocus();
+            return;
+        }
+
+        double descuento = precioGama * (porcentaje / 100);
+        double precioFinal = precioGama - descuento;
+
+        txtPrecioFinal.setText(String.valueOf(precioFinal));
+
+    } catch (Exception e) {
+        txtPrecioFinal.setText("");
     }
+}
 
     private void buscarVehiculo() {
         try {
@@ -181,14 +194,15 @@ public class RegistroOferta extends MantenimientoBase {
 
             for (Oferta o : dao.listar()) {
                 modelo.addRow(new Object[]{
-                        o.getId(),
-                        o.getMatricula(),
-                        o.getDescripcion(),
-                        o.getPrecio()
+                    o.getId(),
+                    o.getMatricula(),
+                    o.getDescripcion(),
+                    o.getPrecio()
                 });
             }
 
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 
     @Override
@@ -206,49 +220,50 @@ public class RegistroOferta extends MantenimientoBase {
         cargarTabla();
     }
 
-    @Override
-    protected boolean validarCampos() {
+   @Override
+protected boolean validarCampos() {
 
-        if (txtId.getText().isEmpty()
-                || txtMatricula.getText().isEmpty()
-                || txtDescripcion.getText().isEmpty()
-                || txtPrecio.getText().isEmpty()) {
+    if (txtId.getText().isEmpty()
+            || txtMatricula.getText().isEmpty()
+            || txtDescripcion.getText().isEmpty()
+            || txtPrecio.getText().isEmpty()) {
 
-            JOptionPane.showMessageDialog(this, "Campos obligatorios vacíos");
-            return false;
-        }
-
-        try {
-            Integer.parseInt(txtId.getText());
-            double porcentaje = Double.parseDouble(txtPrecio.getText());
-
-            if (porcentaje < 15) {
-                JOptionPane.showMessageDialog(this, "Mínimo 15%");
-                return false;
-            }
-
-            if (porcentaje > 100) {
-                JOptionPane.showMessageDialog(this, "Máximo 100%");
-                return false;
-            }
-
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Datos inválidos");
-            return false;
-        }
-
-        try {
-            Vehiculo v = vehiculoDAO.buscar(txtMatricula.getText());
-            if (v == null) {
-                JOptionPane.showMessageDialog(this, "Vehículo no existe");
-                return false;
-            }
-        } catch (Exception e) {
-            return false;
-        }
-
-        return true;
+        JOptionPane.showMessageDialog(this, "Campos obligatorios vacíos");
+        return false;
     }
+
+    try {
+        Integer.parseInt(txtId.getText());
+        double porcentaje = Double.parseDouble(txtPrecio.getText());
+
+        // 🔴 MISMA VALIDACIÓN (backup)
+        if (porcentaje > 15) {
+            JOptionPane.showMessageDialog(this, "Máximo 15%");
+            return false;
+        }
+
+        if (porcentaje <= 0) {
+            JOptionPane.showMessageDialog(this, "Debe ser mayor que 0%");
+            return false;
+        }
+
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Datos inválidos");
+        return false;
+    }
+
+    try {
+        Vehiculo v = vehiculoDAO.buscar(txtMatricula.getText());
+        if (v == null) {
+            JOptionPane.showMessageDialog(this, "Vehículo no existe");
+            return false;
+        }
+    } catch (Exception e) {
+        return false;
+    }
+
+    return true;
+}
 
     @Override
     protected void guardarRegistro() {
@@ -287,7 +302,6 @@ public class RegistroOferta extends MantenimientoBase {
             JOptionPane.showMessageDialog(this, "Error al eliminar");
         }
     }
-    
 
     @Override
     protected void volver() {

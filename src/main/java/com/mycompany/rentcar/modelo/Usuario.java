@@ -17,28 +17,18 @@ public class Usuario {
         this.nombre = nombre;
         this.apellido = apellido;
         this.email = email;
-        
-        
     }
 
-    public int getNivel() {
-        return nivel;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
+    public int getNivel() { return nivel; }
+    public String getNombre() { return nombre; }
+    public String getLogin() { return login; }
+    public String getPass() { return pass; }
+    public String getApellido() { return apellido; }
+    public String getEmail() { return email; }
 
     @Override
     public String toString() {
-        return login + "," + pass + "," + nivel + "," +
-               nombre + "," + apellido + "," + email;
+        return login + ";" + pass + ";" + nivel + ";" +
+               nombre + ";" + apellido + ";" + email;
     }
-    
-    public String getLogin() {
-    return login;
-}
-    public String getPass() { return pass; }
-public String getApellido() { return apellido; }
-public String getEmail() { return email; }
 }

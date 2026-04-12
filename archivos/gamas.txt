@@ -1,4 +1,4 @@
-id,descripcion,precio
-1,Economico( basica),1000.0
-2,media,2000.0
-3,alta,3000.0
+id;descripcion;precio
+1;baja, economica;1000.0
+2;media, regular;2000.0
+3;Alta, cara;3000.0

@@ -14,8 +14,9 @@ public class VehiculoDAO {
         if (!f.exists()) {
             f.getParentFile().mkdirs();
             f.createNewFile();
+
             BufferedWriter bw = new BufferedWriter(new FileWriter(f));
-            bw.write("matricula,marca,modelo,tipoVeh,tipoMotor,gama,desc,techo,aire,cuero,color,auto,status");
+            bw.write("matricula;marca;modelo;tipoVeh;tipoMotor;gama;desc;techo;aire;cuero;color;auto;status"); // 🔴
             bw.newLine();
             bw.close();
         }
@@ -23,11 +24,14 @@ public class VehiculoDAO {
 
     public Vehiculo buscar(String matricula) throws IOException {
         asegurar();
+
         BufferedReader br = new BufferedReader(new FileReader(RUTA));
         br.readLine();
+
         String l;
         while ((l = br.readLine()) != null) {
-            String[] d = l.split(",", -1);
+            String[] d = l.split(";", -1); // 🔴
+
             if (d[0].equals(matricula)) {
                 br.close();
                 return new Vehiculo(
@@ -44,72 +48,87 @@ public class VehiculoDAO {
                 );
             }
         }
+
         br.close();
         return null;
     }
 
     public void guardar(Vehiculo v, String original) throws IOException {
         asegurar();
+
         List<String> lineas = new ArrayList<>();
         BufferedReader br = new BufferedReader(new FileReader(RUTA));
         String enc = br.readLine();
+
         boolean act = false;
 
         String l;
         while ((l = br.readLine()) != null) {
-            if (l.split(",")[0].equals(original)) {
+            if (l.split(";", -1)[0].equals(original)) { // 🔴
                 lineas.add(v.toString());
                 act = true;
-            } else lineas.add(l);
+            } else {
+                lineas.add(l);
+            }
         }
         br.close();
 
         if (!act) lineas.add(v.toString());
 
         BufferedWriter bw = new BufferedWriter(new FileWriter(RUTA,false));
-        bw.write(enc); bw.newLine();
-        for(String s: lineas){ bw.write(s); bw.newLine(); }
+        bw.write(enc);
+        bw.newLine();
+
+        for(String s: lineas){
+            bw.write(s);
+            bw.newLine();
+        }
+
         bw.close();
     }
-    
+
     public void eliminar(String matricula) throws IOException {
 
-    File archivo = new File(RUTA);
-    List<String> lineas = new ArrayList<>();
+        File archivo = new File(RUTA);
+        List<String> lineas = new ArrayList<>();
 
-    BufferedReader br = new BufferedReader(new FileReader(archivo));
-    String encabezado = br.readLine(); // guardar encabezado
+        BufferedReader br = new BufferedReader(new FileReader(archivo));
+        String encabezado = br.readLine();
 
-    String linea;
-    while ((linea = br.readLine()) != null) {
-        String[] d = linea.split(",", -1);
+        String linea;
+        while ((linea = br.readLine()) != null) {
+            String[] d = linea.split(";", -1); // 🔴
 
-        if (!d[0].equals(matricula)) { // d[0] = matricula
-            lineas.add(linea);
+            if (!d[0].equals(matricula)) {
+                lineas.add(linea);
+            }
         }
-    }
-    br.close();
+        br.close();
 
-    BufferedWriter bw = new BufferedWriter(new FileWriter(archivo, false));
-    bw.write(encabezado);
-    bw.newLine();
-
-    for (String l : lineas) {
-        bw.write(l);
+        BufferedWriter bw = new BufferedWriter(new FileWriter(archivo, false));
+        bw.write(encabezado);
         bw.newLine();
+
+        for (String l : lineas) {
+            bw.write(l);
+            bw.newLine();
+        }
+
+        bw.close();
     }
-    bw.close();
-}
 
     public List<Vehiculo> listar() throws IOException {
         asegurar();
-        List<Vehiculo> l = new ArrayList<>();
+
+        List<Vehiculo> lista = new ArrayList<>();
         BufferedReader br = new BufferedReader(new FileReader(RUTA));
         br.readLine();
+
         String x;
-        while((x=br.readLine())!=null){
-            String[] d = x.split(",", -1);
-            l.add(new Vehiculo(
+        while((x = br.readLine()) != null){
+            String[] d = x.split(";", -1); // 🔴
+
+            lista.add(new Vehiculo(
                     d[0], d[1], d[2],
                     Integer.parseInt(d[3]),
                     Integer.parseInt(d[4]),
@@ -122,7 +141,8 @@ public class VehiculoDAO {
                     Boolean.parseBoolean(d[12])
             ));
         }
+
         br.close();
-        return l;
+        return lista;
     }
 }

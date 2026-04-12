@@ -17,7 +17,7 @@ public class ReservaDAO {
             f.createNewFile();
 
             BufferedWriter bw = new BufferedWriter(new FileWriter(f));
-            bw.write("matricula,cedula,oferta,fechaReserva,fechaSalida,fechaEntrada,observacion,dias,total");
+            bw.write("matricula;cedula;oferta;fechaReserva;fechaSalida;fechaEntrada;observacion;dias;total"); // 🔴 CAMBIADO
             bw.newLine();
             bw.close();
         }
@@ -27,7 +27,7 @@ public class ReservaDAO {
         asegurar();
 
         BufferedWriter bw = new BufferedWriter(new FileWriter(RUTA, true));
-        bw.write(r.toString());
+        bw.write(r.toString()); // ya usa ;
         bw.newLine();
         bw.close();
     }
@@ -42,7 +42,7 @@ public class ReservaDAO {
 
         String l;
         while ((l = br.readLine()) != null) {
-            String[] d = l.split(",", -1);
+            String[] d = l.split(";", -1); // 🔴 CAMBIADO
 
             lista.add(new Reserva(
                     d[0], d[1], d[2],
@@ -67,7 +67,7 @@ public class ReservaDAO {
 
         String l;
         while ((l = br.readLine()) != null) {
-            if (!l.split(",")[0].equals(matricula)) {
+            if (!l.split(";", -1)[0].equals(matricula)) { // 🔴 CAMBIADO
                 lineas.add(l);
             }
         }

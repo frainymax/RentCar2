@@ -42,6 +42,7 @@ public class RegistroVehiculo extends MantenimientoBase {
         super();
 
         this.menu = m;
+        chkStatus.setEnabled(false);
         txtDescGama.setEditable(false);
         txtPrecioGama.setEditable(false);
         txtDescGama.setBackground(Color.LIGHT_GRAY);

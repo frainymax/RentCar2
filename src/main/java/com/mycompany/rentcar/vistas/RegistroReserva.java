@@ -220,14 +220,26 @@ contenedor.add(scrollForm, BorderLayout.NORTH);
         try{
             modelo.setRowCount(0);
 
-            for(Reserva r: dao.listar()){
-                modelo.addRow(new Object[]{
-                        r.getMatricula(),
-                        r.getCedula(),
-                        r.getDias(),
-                        r.getTotal()
-                });
-            }
+            for(Reserva r: dao.listar()) {
+
+    boolean yaRecibido = false;
+
+    for (Recepcion rec : new RecepcionDAO().listar()) {
+        if (rec.getMatricula().equals(r.getMatricula())) {
+            yaRecibido = true;
+            break;
+        }
+    }
+
+    if (!yaRecibido) {
+        modelo.addRow(new Object[]{
+                r.getMatricula(),
+                r.getCedula(),
+                r.getDias(),
+                r.getTotal()
+        });
+    }
+}
 
         }catch(Exception ignored){}
     }

@@ -1,3 +1,2 @@
-id,matricula,descripcion,precio
-30,214,waos,2400.0
-1,A123,example,850.0
+id;matricula;descripcion;precio
+1;A123;Oferta para, mi amigo;850.0

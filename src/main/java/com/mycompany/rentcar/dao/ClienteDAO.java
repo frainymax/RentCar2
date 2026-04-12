@@ -96,7 +96,7 @@ public class ClienteDAO {
 
         String l;
         while ((l = br.readLine()) != null) {
-            if (!l.split(";")[0].equals(cedula)) { // 👈 CAMBIADO
+            if (!l.split(";")[0].equals(cedula)) {  
                 lineas.add(l);
             }
         }
@@ -125,7 +125,7 @@ public class ClienteDAO {
 
         String l;
         while ((l = br.readLine()) != null) {
-            String[] d = l.split(";", -1); // 👈 CAMBIADO
+            String[] d = l.split(";", -1);  
 
             lista.add(new Cliente(
                     d[0], d[1], d[2],

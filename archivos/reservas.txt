@@ -1,2 +1,2 @@
-matricula,cedula,oferta,fechaReserva,fechaSalida,fechaEntrada,observacion,dias,total
-A123,123,1,2026-04-08,2026-04-10,2026-04-12,LA PARA,2,1700.0
+matricula;cedula;oferta;fechaReserva;fechaSalida;fechaEntrada;observacion;dias;total
+A123;123;1;2026-04-12;2026-04-12;2026-04-14;LA PAMPARA DE LA PIEZA, LA PARA;2;1700.0

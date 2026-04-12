@@ -39,8 +39,8 @@ public class Reserva {
 
     @Override
     public String toString() {
-        return matricula + "," + cedula + "," + oferta + "," +
-               fechaReserva + "," + fechaSalida + "," + fechaEntrada + "," +
-               observacion + "," + dias + "," + total;
+        return matricula + ";" + cedula + ";" + oferta + ";" +
+               fechaReserva + ";" + fechaSalida + ";" + fechaEntrada + ";" +
+               observacion + ";" + dias + ";" + total;
     }
 }
