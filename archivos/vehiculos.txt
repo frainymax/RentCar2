@@ -1,2 +1,3 @@
 matricula;marca;modelo;tipoVeh;tipoMotor;gama;desc;techo;aire;cuero;color;auto;status
-A123;Toyota;Corolla;1;1;1;baja, economica;true;false;false;mamen;true;false
+A123;Toyota;Corolla;1;1;1;baja, economica;true;false;false;mamen;true;true
+U77;Lamborgini;lapara;1;1;3;Alta, cara;true;true;true;azul;true;false

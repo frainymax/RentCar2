@@ -7,6 +7,8 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 
 public class RegistroRecepcion extends MantenimientoBase {
 
@@ -20,17 +22,18 @@ public class RegistroRecepcion extends MantenimientoBase {
     JTextField txtId = new JTextField(15);
     JTextField txtMatricula = new JTextField(15);
     JTextField txtFechaEntrada = new JTextField(15);
-    JTextField txtFechaRecepcion = new JTextField(15);
+
+    // 🔥 CALENDARIO
+    JSpinner spFechaRecepcion = new JSpinner(new SpinnerDateModel());
+    JSpinner.DateEditor editor = new JSpinner.DateEditor(spFechaRecepcion, "yyyy-MM-dd");
+
     JTextField txtObs = new JTextField(15);
 
     JLabel lblEstado = new JLabel("Creando");
 
     private JTable tabla = new JTable();
     private DefaultTableModel modelo = new DefaultTableModel(){
-        @Override
-        public boolean isCellEditable(int row, int column) {
-            return false;
-        }
+        public boolean isCellEditable(int r, int c){ return false; }
     };
 
     public RegistroRecepcion(MenuAdmin m) {
@@ -43,36 +46,28 @@ public class RegistroRecepcion extends MantenimientoBase {
 
         JPanel contenedor = new JPanel(new BorderLayout());
 
-        // ===== FORM =====
         JPanel form = new JPanel(new GridLayout(0,2,5,5));
+
+        spFechaRecepcion.setEditor(editor);
 
         form.add(new JLabel("Estado")); form.add(lblEstado);
         form.add(new JLabel("ID")); form.add(txtId);
         form.add(new JLabel("Matrícula")); form.add(txtMatricula);
         form.add(new JLabel("Fecha Entrada")); form.add(txtFechaEntrada);
-        form.add(new JLabel("Fecha Recepción")); form.add(txtFechaRecepcion);
+        form.add(new JLabel("Fecha Recepción")); form.add(spFechaRecepcion);
         form.add(new JLabel("Observación")); form.add(txtObs);
 
-        JScrollPane scrollForm = new JScrollPane(form);
-        scrollForm.setPreferredSize(new Dimension(600,180));
+        contenedor.add(form, BorderLayout.NORTH);
 
-        contenedor.add(scrollForm, BorderLayout.NORTH);
-
-        // ===== TABLA =====
         modelo.setColumnIdentifiers(new String[]{
                 "ID","Matricula","Fecha Entrada","Fecha Recepción"
         });
 
         tabla.setModel(modelo);
+        contenedor.add(new JScrollPane(tabla), BorderLayout.CENTER);
 
-        JScrollPane scrollTabla = new JScrollPane(tabla);
-        scrollTabla.setPreferredSize(new Dimension(600,200));
+        add(contenedor);
 
-        contenedor.add(scrollTabla, BorderLayout.CENTER);
-
-        add(contenedor, BorderLayout.CENTER);
-
-        // 🔥 BLOQUEOS
         txtFechaEntrada.setEnabled(false);
 
         eventos();
@@ -81,62 +76,63 @@ public class RegistroRecepcion extends MantenimientoBase {
 
     private void eventos(){
 
-        // ===== BUSCAR POR ID =====
-        txtId.addActionListener(e -> {
-            try{
-                Recepcion r = dao.buscar(txtId.getText());
-
-                if(r != null){
-                    original = r.getId();
-
-                    txtMatricula.setText(r.getMatricula());
-                    txtFechaEntrada.setText(r.getFechaEntrada());
-                    txtFechaRecepcion.setText(r.getFechaRecepcion());
-                    txtObs.setText(r.getObservacion());
-
-                    txtMatricula.setEnabled(false);
-
-                    lblEstado.setText("Modificando");
-                    JOptionPane.showMessageDialog(this,"Modificando");
-                    estadoModificar();
-
-                }else{
-                    original = "";
-                    txtMatricula.setEnabled(true);
-
-                    lblEstado.setText("Creando");
-                    JOptionPane.showMessageDialog(this,"Creando");
-                    estadoNuevo();
-                }
-
-            }catch(Exception ignored){}
+        // ENTER FLOW
+        txtId.addActionListener(e -> txtMatricula.requestFocus());
+        txtMatricula.addActionListener(e -> {
+            cargarReserva();
+            spFechaRecepcion.requestFocus();
         });
 
-        // ===== BUSCAR RESERVA =====
-        txtMatricula.addActionListener(e -> cargarReserva());
+        // CLICK TABLA
+        tabla.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+
+                int fila = tabla.getSelectedRow();
+
+                txtId.setText(modelo.getValueAt(fila,0).toString());
+                txtMatricula.setText(modelo.getValueAt(fila,1).toString());
+                txtFechaEntrada.setText(modelo.getValueAt(fila,2).toString());
+
+                // convertir string → date
+                LocalDate fecha = LocalDate.parse(modelo.getValueAt(fila,3).toString());
+                Date date = Date.from(fecha.atStartOfDay(ZoneId.systemDefault()).toInstant());
+                spFechaRecepcion.setValue(date);
+
+                original = txtId.getText();
+
+                txtId.setEnabled(false); // 🔥 BLOQUEAR ID
+                txtMatricula.setEnabled(false);
+
+                lblEstado.setText("Modificando");
+                estadoModificar();
+            }
+        });
     }
 
     private void cargarReserva(){
         try{
             for(Reserva r: reservaDAO.listar()){
-
                 if(r.getMatricula().equals(txtMatricula.getText())){
                     txtFechaEntrada.setText(r.getFechaEntrada());
                     return;
                 }
             }
-
-            JOptionPane.showMessageDialog(this,"No hay reserva para esa matrícula");
+            JOptionPane.showMessageDialog(this,"No hay reserva");
 
         }catch(Exception e){
-            JOptionPane.showMessageDialog(this,"Error buscando reserva");
+            JOptionPane.showMessageDialog(this,"Error");
         }
     }
 
-    private void cargarTabla(){
-        try{
-            modelo.setRowCount(0);
+    private String getFechaSpinner(){
+        Date date = (Date) spFechaRecepcion.getValue();
+        return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString();
+    }
 
+    private void cargarTabla(){
+        modelo.setRowCount(0);
+
+        try{
             for(Recepcion r: dao.listar()){
                 modelo.addRow(new Object[]{
                         r.getId(),
@@ -145,20 +141,26 @@ public class RegistroRecepcion extends MantenimientoBase {
                         r.getFechaRecepcion()
                 });
             }
-
         }catch(Exception ignored){}
     }
 
     @Override
     protected void limpiarCampos() {
+
         txtId.setText("");
         txtMatricula.setText("");
         txtFechaEntrada.setText("");
-        txtFechaRecepcion.setText("");
         txtObs.setText("");
 
-        lblEstado.setText("Creando");
+        spFechaRecepcion.setValue(new Date());
+
         original = "";
+        lblEstado.setText("Creando");
+
+        txtId.setEnabled(true); // 🔥 desbloquear
+        txtMatricula.setEnabled(true);
+
+        tabla.clearSelection(); // 🔥 FIX BUG
 
         cargarTabla();
     }
@@ -167,24 +169,30 @@ public class RegistroRecepcion extends MantenimientoBase {
     protected boolean validarCampos() {
 
         if(txtId.getText().isEmpty()
-                || txtMatricula.getText().isEmpty()
-                || txtFechaRecepcion.getText().isEmpty()){
-
+                || txtMatricula.getText().isEmpty()){
             JOptionPane.showMessageDialog(this,"Campos obligatorios");
             return false;
         }
 
+        // 🔥 VALIDAR ID DUPLICADO
         try{
+            Recepcion existente = dao.buscar(txtId.getText());
+
+            if(existente != null && !txtId.getText().equals(original)){
+                JOptionPane.showMessageDialog(this,"ID ya existe");
+                return false;
+            }
+
             LocalDate entrada = LocalDate.parse(txtFechaEntrada.getText());
-            LocalDate recepcion = LocalDate.parse(txtFechaRecepcion.getText());
+            LocalDate recepcion = LocalDate.parse(getFechaSpinner());
 
             if(recepcion.isBefore(entrada)){
-                JOptionPane.showMessageDialog(this,"Recepción menor que entrada");
+                JOptionPane.showMessageDialog(this,"Fecha inválida");
                 return false;
             }
 
         }catch(Exception e){
-            JOptionPane.showMessageDialog(this,"Formato de fecha inválido");
+            JOptionPane.showMessageDialog(this,"Error en datos");
             return false;
         }
 
@@ -199,21 +207,19 @@ public class RegistroRecepcion extends MantenimientoBase {
                     txtId.getText(),
                     txtMatricula.getText(),
                     txtFechaEntrada.getText(),
-                    txtFechaRecepcion.getText(),
+                    getFechaSpinner(),
                     txtObs.getText()
             );
 
             dao.guardar(r, original);
 
-            // 🔥 LIBERAR VEHÍCULO
             Vehiculo v = vehiculoDAO.buscar(txtMatricula.getText());
-
             if(v != null){
                 v.setStatus(true);
                 vehiculoDAO.guardar(v, v.getMatricula());
             }
 
-            JOptionPane.showMessageDialog(this,"Recepción guardada");
+            JOptionPane.showMessageDialog(this,"Guardado");
             limpiarCampos();
 
         }catch(Exception e){
@@ -222,37 +228,41 @@ public class RegistroRecepcion extends MantenimientoBase {
     }
 
     @Override
-protected void eliminarRegistro() {
-    try {
-        int fila = tabla.getSelectedRow();
+    protected void eliminarRegistro() {
+        try {
 
-        if (fila == -1) {
-            JOptionPane.showMessageDialog(this, "Seleccione una recepción");
-            return;
+            String id = txtId.getText();
+
+            if(id.isEmpty()){
+                JOptionPane.showMessageDialog(this,"Seleccione o cargue una recepción");
+                return;
+            }
+
+            int op = JOptionPane.showConfirmDialog(this, "¿Eliminar?");
+            if (op != JOptionPane.YES_OPTION) return;
+
+            Recepcion r = dao.buscar(id);
+
+            if(r == null){
+                JOptionPane.showMessageDialog(this,"No existe");
+                return;
+            }
+
+            dao.eliminar(id);
+
+            Vehiculo v = vehiculoDAO.buscar(r.getMatricula());
+            if (v != null) {
+                v.setStatus(false);
+                vehiculoDAO.guardar(v, v.getMatricula());
+            }
+
+            JOptionPane.showMessageDialog(this, "Eliminado");
+            limpiarCampos();
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error");
         }
-
-        int op = JOptionPane.showConfirmDialog(this, "¿Eliminar?");
-        if (op != JOptionPane.YES_OPTION) return;
-
-        String id = modelo.getValueAt(fila, 0).toString();
-        String matricula = modelo.getValueAt(fila, 1).toString();
-
-        dao.eliminar(id);
-
-        // 🔥 IMPORTANTE: volver el vehículo a reservado
-        Vehiculo v = vehiculoDAO.buscar(matricula);
-        if (v != null) {
-            v.setStatus(false); // reservado otra vez
-            vehiculoDAO.guardar(v, v.getMatricula());
-        }
-
-        JOptionPane.showMessageDialog(this, "Recepción eliminada");
-        limpiarCampos();
-
-    } catch (Exception e) {
-        JOptionPane.showMessageDialog(this, "Error");
     }
-}
 
     @Override
     protected void volver() {

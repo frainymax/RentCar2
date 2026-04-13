@@ -1,2 +1,3 @@
 cedula;nombre;apellido;direccion;email;telefono
 123;Juan;Perez;calle #9, casa #18, los quemados;lapara@gmail.com;8494363077
+666;Petronilo;sinforoso;Santiago;waos@gmail.com;92387982347

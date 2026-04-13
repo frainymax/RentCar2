@@ -1,1 +1,2 @@
 id;matricula;fechaEntrada;fechaRecepcion;observacion
+1;A123;2026-04-15;2027-04-20;
