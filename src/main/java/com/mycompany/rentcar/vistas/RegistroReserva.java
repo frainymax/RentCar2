@@ -20,6 +20,9 @@ public class RegistroReserva extends MantenimientoBase {
 
     private MenuAdmin menu;
 
+    // 🔥 CONTROL DE MODO
+    private boolean modoVisualizando = false;
+
     JTextField txtMatricula = new JTextField(15);
     JTextField txtCedula = new JTextField(15);
     JTextField txtOferta = new JTextField(15);
@@ -28,8 +31,9 @@ public class RegistroReserva extends MantenimientoBase {
     JTextField txtVehiculo = new JTextField(15);
 
     JTextField txtFechaReserva = new JTextField(15);
-    JTextField txtSalida = new JTextField(15);
-    JTextField txtEntrada = new JTextField(15);
+
+    JSpinner txtSalida = new JSpinner(new SpinnerDateModel());
+    JSpinner txtEntrada = new JSpinner(new SpinnerDateModel());
 
     JTextField txtDias = new JTextField(15);
     JTextField txtTotal = new JTextField(15);
@@ -53,9 +57,10 @@ public class RegistroReserva extends MantenimientoBase {
         setSize(600, 500);
         setLocationRelativeTo(null);
 
-        JPanel contenedor = new JPanel(new BorderLayout());
+        txtSalida.setEditor(new JSpinner.DateEditor(txtSalida, "yyyy-MM-dd"));
+        txtEntrada.setEditor(new JSpinner.DateEditor(txtEntrada, "yyyy-MM-dd"));
 
-        // ===== FORM =====
+        JPanel contenedor = new JPanel(new BorderLayout());
         JPanel form = new JPanel(new GridLayout(0,2,5,5));
 
         form.add(new JLabel("Estado")); form.add(lblEstado);
@@ -72,16 +77,12 @@ public class RegistroReserva extends MantenimientoBase {
 
         form.add(new JLabel("Días")); form.add(txtDias);
         form.add(new JLabel("Total")); form.add(txtTotal);
-
         form.add(new JLabel("Observación")); form.add(txtObs);
 
-        JScrollPane scrollForm = new JScrollPane(form);
-        scrollForm.setPreferredSize(new Dimension(600, 220));
-        contenedor.add(scrollForm, BorderLayout.NORTH);
+        contenedor.add(new JScrollPane(form), BorderLayout.NORTH);
 
-        // ===== TABLA =====
-       modelo.setColumnIdentifiers(new String[]{
-    "Matricula","Cedula","F.Reserva","Salida","Entrada","Dias","Total","Obs"
+        modelo.setColumnIdentifiers(new String[]{
+    "Matricula","Cedula","F.Reserva","Salida","Entrada","Dias","Total","Obs","Oferta"
 });
 
         tabla.setModel(modelo);
@@ -92,12 +93,9 @@ public class RegistroReserva extends MantenimientoBase {
             }
         });
 
-        JScrollPane scrollTabla = new JScrollPane(tabla);
-        contenedor.add(scrollTabla, BorderLayout.CENTER);
-
+        contenedor.add(new JScrollPane(tabla), BorderLayout.CENTER);
         add(contenedor, BorderLayout.CENTER);
 
-        // ===== BLOQUEOS =====
         txtNombre.setEnabled(false);
         txtVehiculo.setEnabled(false);
         txtFechaReserva.setEnabled(false);
@@ -112,38 +110,67 @@ public class RegistroReserva extends MantenimientoBase {
 
     private void eventos(){
 
-        // ===== VALIDAR MATRÍCULA =====
-        txtMatricula.addActionListener(e -> {
-            try{
-                Vehiculo v = vehiculoDAO.buscar(txtMatricula.getText());
+       txtMatricula.addActionListener(e -> {
 
-                if(v != null){
+    if(modoVisualizando) return;
 
-                    if(!v.isStatus()){
-                        JOptionPane.showMessageDialog(this,"Vehículo ya reservado");
-                        txtMatricula.setText("");
-                        txtVehiculo.setText("");
-                        txtMatricula.requestFocus();
-                        return;
-                    }
+    try{
 
-                    txtVehiculo.setText(v.getMarca()+" "+v.getModelo());
+        String mat = txtMatricula.getText();
 
-                } else {
-                    JOptionPane.showMessageDialog(this,"Vehículo no existe");
-                    txtMatricula.setText("");
-                }
+        // 🔥 BUSCAR RESERVA EXISTENTE
+        for(Reserva r : dao.listar()){
+            if(r.getMatricula().equals(mat)){
 
-            }catch(Exception ignored){}
-        });
+                // 👉 CARGAR COMO SI HICIERAS CLICK
+                modoVisualizando = true;
 
-        // ===== CLIENTE =====
+                txtCedula.setText(r.getCedula());
+                txtFechaReserva.setText(r.getFechaReserva());
+
+                txtSalida.setValue(java.sql.Date.valueOf(r.getFechaSalida()));
+                txtEntrada.setValue(java.sql.Date.valueOf(r.getFechaEntrada()));
+
+                txtDias.setText(String.valueOf(r.getDias()));
+                txtTotal.setText(String.valueOf(r.getTotal()));
+                txtObs.setText(r.getObservacion());
+
+                bloquearFormulario();
+                return;
+            }
+        }
+
+        // 🔥 SI NO EXISTE → CREAR NORMAL
+        Vehiculo v = vehiculoDAO.buscar(mat);
+
+        if(v != null){
+
+            if(!v.isStatus()){
+                JOptionPane.showMessageDialog(this,"Vehículo ya reservado");
+                txtMatricula.setText("");
+                return;
+            }
+
+            txtVehiculo.setText(v.getMarca()+" "+v.getModelo());
+            txtCedula.requestFocus();
+
+        } else {
+            JOptionPane.showMessageDialog(this,"Vehículo no existe");
+            txtMatricula.setText("");
+        }
+
+    }catch(Exception ignored){}
+});
+
         txtCedula.addActionListener(e -> {
+            if(modoVisualizando) return;
+
             try{
                 Cliente c = clienteDAO.buscar(txtCedula.getText());
 
                 if(c != null){
                     txtNombre.setText(c.getNombre()+" "+c.getApellido());
+                    txtOferta.requestFocus();
                 } else {
                     JOptionPane.showMessageDialog(this,"Cliente no existe");
                 }
@@ -151,42 +178,72 @@ public class RegistroReserva extends MantenimientoBase {
             }catch(Exception ignored){}
         });
 
-        // ===== OFERTA =====
         txtOferta.addActionListener(e -> {
-            try {
-                if (!txtOferta.getText().isEmpty()) {
-                    Oferta o = ofertaDAO.buscar(txtOferta.getText());
+    if(modoVisualizando) return;
 
-                    if (o == null) {
-                        JOptionPane.showMessageDialog(this, "Oferta no existe");
-                        txtOferta.setText("");
-                    }
-                }
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Error buscando oferta");
+    try {
+        if (!txtOferta.getText().isEmpty()) {
+            Oferta o = ofertaDAO.buscar(txtOferta.getText());
+
+            if (o == null) {
+                JOptionPane.showMessageDialog(this, "La oferta no existe");
+                txtOferta.setText("");
+                return;
             }
-        });
 
-        txtEntrada.addActionListener(e -> calcular());
+            // 🔥 VALIDACIÓN CRÍTICA:
+            // Verificamos si la matrícula de la oferta coincide con la del txtMatricula
+            String matriculaVehiculo = txtMatricula.getText();
+            if (!o.getMatricula().equals(matriculaVehiculo)) {
+                JOptionPane.showMessageDialog(this, "Esta oferta no pertenece a este vehículo.\n"
+                        + "Vehículo requerido: " + o.getMatricula());
+                txtOferta.setText("");
+                return;
+            }
+            
+            JOptionPane.showMessageDialog(this, "Oferta aplicada correctamente");
+        }
+        txtSalida.requestFocus();
+    } catch (Exception ex) {
+        JOptionPane.showMessageDialog(this, "Error validando la oferta");
+    }
+});
 
-        // ===== CLICK TABLA =====
+     txtEntrada.addChangeListener(e -> {
+
+    if(modoVisualizando) return;
+
+    // 🔥 SOLO CALCULAR SI YA HAY MATRÍCULA
+    if(txtMatricula.getText().isEmpty()) return;
+
+    calcular();
+});
         tabla.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
+    public void mouseClicked(java.awt.event.MouseEvent evt) {
+        modoVisualizando = true; 
 
-                int fila = tabla.getSelectedRow();
+        int fila = tabla.getSelectedRow();
 
-                txtMatricula.setText(modelo.getValueAt(fila,0).toString());
-                txtCedula.setText(modelo.getValueAt(fila,1).toString());
-                txtFechaReserva.setText(modelo.getValueAt(fila,2).toString());
-                txtSalida.setText(modelo.getValueAt(fila,3).toString());
-                txtEntrada.setText(modelo.getValueAt(fila,4).toString());
-                txtDias.setText(modelo.getValueAt(fila,5).toString());
-                txtTotal.setText(modelo.getValueAt(fila,6).toString());
-                 txtObs.setText(modelo.getValueAt(fila,7).toString());
+        txtMatricula.setText(modelo.getValueAt(fila, 0).toString());
+        txtCedula.setText(modelo.getValueAt(fila, 1).toString());
+        txtFechaReserva.setText(modelo.getValueAt(fila, 2).toString());
 
-                bloquearFormulario();
-            }
-        });
+        txtSalida.setValue(java.sql.Date.valueOf(modelo.getValueAt(fila, 3).toString()));
+        txtEntrada.setValue(java.sql.Date.valueOf(modelo.getValueAt(fila, 4).toString()));
+
+        txtDias.setText(modelo.getValueAt(fila, 5).toString());
+        txtTotal.setText(modelo.getValueAt(fila, 6).toString());
+        txtObs.setText(modelo.getValueAt(fila, 7).toString());
+        
+        // 👉 PASO A: Si tu tabla tiene la oferta, cárgala. Si no, déjalo vacío para que cargue normal
+        try { txtOferta.setText(modelo.getValueAt(fila, 8).toString()); } catch(Exception e) { txtOferta.setText(""); }
+
+        // 👉 PASO B: Disparar la búsqueda de nombres
+        cargarDatosRelacionados();
+
+        bloquearFormulario();
+    }
+});
     }
 
     private void bloquearFormulario(){
@@ -207,54 +264,50 @@ public class RegistroReserva extends MantenimientoBase {
         txtObs.setEnabled(true);
     }
 
-   private void calcular(){
-    try{
+    private void calcular(){
+        try{
+            LocalDate hoy = LocalDate.now();
 
-        if(txtSalida.getText().isEmpty() || txtEntrada.getText().isEmpty()){
-            JOptionPane.showMessageDialog(this,"Debe completar las fechas");
-            return;
-        }
+            LocalDate salida = ((java.util.Date) txtSalida.getValue())
+                    .toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
 
-        LocalDate hoy = LocalDate.now();
-        LocalDate salida = LocalDate.parse(txtSalida.getText());
-        LocalDate entrada = LocalDate.parse(txtEntrada.getText());
+            LocalDate entrada = ((java.util.Date) txtEntrada.getValue())
+                    .toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
 
-        if(salida.isBefore(hoy)){
-            JOptionPane.showMessageDialog(this,"La fecha de salida no puede ser menor que hoy");
-            txtSalida.requestFocus();
-            return;
-        }
-
-        if(entrada.isBefore(salida)){
-            JOptionPane.showMessageDialog(this,"La fecha de entrada no puede ser menor que la salida");
-            txtEntrada.requestFocus();
-            return;
-        }
-
-        long dias = ChronoUnit.DAYS.between(salida, entrada);
-        txtDias.setText(String.valueOf(dias));
-
-        double precio;
-
-        if(!txtOferta.getText().isEmpty()){
-            Oferta o = ofertaDAO.buscar(txtOferta.getText());
-            if(o == null){
-                JOptionPane.showMessageDialog(this,"Oferta no existe");
+            if(salida.isBefore(hoy)){
+                JOptionPane.showMessageDialog(this,"La fecha de salida no puede ser menor que hoy");
                 return;
             }
-            precio = o.getPrecio();
-        } else {
-            Vehiculo v = vehiculoDAO.buscar(txtMatricula.getText());
-            Gama g = gamaDAO.buscarPorId(v.getGama());
-            precio = g.getPrecio();
+
+            if(entrada.isBefore(salida)){
+                JOptionPane.showMessageDialog(this,"La fecha de entrada no puede ser menor que la salida");
+                return;
+            }
+
+            long dias = ChronoUnit.DAYS.between(salida, entrada);
+            txtDias.setText(String.valueOf(dias));
+
+            double precio;
+
+            if(!txtOferta.getText().isEmpty()){
+                Oferta o = ofertaDAO.buscar(txtOferta.getText());
+                if(o == null){
+                    JOptionPane.showMessageDialog(this,"Oferta no existe");
+                    return;
+                }
+                precio = o.getPrecio();
+            } else {
+                Vehiculo v = vehiculoDAO.buscar(txtMatricula.getText());
+                Gama g = gamaDAO.buscarPorId(v.getGama());
+                precio = g.getPrecio();
+            }
+
+            txtTotal.setText(String.valueOf(precio * dias));
+
+        }catch(Exception e){
+            JOptionPane.showMessageDialog(this,"Error en fechas");
         }
-
-        txtTotal.setText(String.valueOf(precio * dias));
-
-    }catch(Exception e){
-        JOptionPane.showMessageDialog(this,"Formato de fecha inválido (usa YYYY-MM-DD)");
     }
-}
 
     private void cargarTabla(){
         try{
@@ -272,16 +325,17 @@ public class RegistroReserva extends MantenimientoBase {
                 }
 
                 if (!yaRecibido) {
-                 modelo.addRow(new Object[]{
-    r.getMatricula(),
-    r.getCedula(),
-    r.getFechaReserva(),
-    r.getFechaSalida(),
-    r.getFechaEntrada(),
-    r.getDias(),
-    r.getTotal(),
-    r.getObservacion()
-});
+                    modelo.addRow(new Object[]{
+                            r.getMatricula(),
+                            r.getCedula(),
+                            r.getFechaReserva(),
+                            r.getFechaSalida(),
+                            r.getFechaEntrada(),
+                            r.getDias(),
+                            r.getTotal(),
+                            r.getObservacion(),
+                            r.getOferta()
+                    }); // <-- Aquí estaba el error, faltaba cerrar el Object[] y el addRow
                 }
             }
 
@@ -290,13 +344,22 @@ public class RegistroReserva extends MantenimientoBase {
 
     @Override
     protected void limpiarCampos() {
+
+        modoVisualizando = false; // 🔥 volver a modo normal
+
         txtMatricula.setText("");
         txtCedula.setText("");
         txtOferta.setText("");
         txtNombre.setText("");
         txtVehiculo.setText("");
-        txtSalida.setText("");
-        txtEntrada.setText("");
+
+       modoVisualizando = true; // 🔥 evitar triggers
+
+txtSalida.setValue(new java.util.Date());
+txtEntrada.setValue(new java.util.Date());
+
+modoVisualizando = false; // 🔥 volver normal
+
         txtDias.setText("");
         txtTotal.setText("");
         txtObs.setText("");
@@ -315,21 +378,12 @@ public class RegistroReserva extends MantenimientoBase {
 
         if(txtMatricula.getText().isEmpty()
                 || txtCedula.getText().isEmpty()
-                || txtSalida.getText().isEmpty()
-                || txtEntrada.getText().isEmpty()){
+                || txtSalida.getValue() == null
+                || txtEntrada.getValue() == null){
 
             JOptionPane.showMessageDialog(this,"Campos obligatorios");
             return false;
         }
-
-        try{
-            for(Reserva r : dao.listar()){
-                if(r.getMatricula().equals(txtMatricula.getText())){
-                    JOptionPane.showMessageDialog(this,"Ya existe reserva para este vehículo");
-                    return false;
-                }
-            }
-        }catch(Exception ignored){}
 
         return true;
     }
@@ -342,8 +396,8 @@ public class RegistroReserva extends MantenimientoBase {
                     txtCedula.getText(),
                     txtOferta.getText(),
                     txtFechaReserva.getText(),
-                    txtSalida.getText(),
-                    txtEntrada.getText(),
+                    txtSalida.getValue().toString(),
+                    txtEntrada.getValue().toString(),
                     txtObs.getText(),
                     Integer.parseInt(txtDias.getText()),
                     Double.parseDouble(txtTotal.getText())
@@ -404,4 +458,18 @@ public class RegistroReserva extends MantenimientoBase {
         this.dispose();
         menu.setVisible(true);
     }
+    
+    private void cargarDatosRelacionados() {
+    try {
+        // Buscar y mostrar nombre del Vehículo
+        Vehiculo v = vehiculoDAO.buscar(txtMatricula.getText());
+        if (v != null) txtVehiculo.setText(v.getMarca() + " " + v.getModelo());
+
+        // Buscar y mostrar nombre del Cliente
+        Cliente c = clienteDAO.buscar(txtCedula.getText());
+        if (c != null) txtNombre.setText(c.getNombre() + " " + c.getApellido());
+        
+        // La oferta ya se carga en el txtOferta desde la tabla (paso siguiente)
+    } catch (Exception ignored) {}
+}
 }

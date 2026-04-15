@@ -1,3 +1,1 @@
 matricula;cedula;oferta;fechaReserva;fechaSalida;fechaEntrada;observacion;dias;total
-A123;123;1;2026-04-12;2026-04-13;2026-04-15;WAOS;2;1700.0
-U77;666;1;2026-04-13;2026-04-13;2026-04-14;hola;1;850.0
