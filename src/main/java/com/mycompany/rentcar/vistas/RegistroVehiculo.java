@@ -11,6 +11,8 @@ import java.awt.*;
 
 public class RegistroVehiculo extends MantenimientoBase {
 
+    // ✅ FIX #3: chkTocado se maneja correctamente ahora.
+    // Se pone true solo cuando el usuario interactúa, o cuando se carga un registro existente.
     private boolean chkTocado = false;
 
     private VehiculoDAO dao = new VehiculoDAO();
@@ -21,21 +23,21 @@ public class RegistroVehiculo extends MantenimientoBase {
     private JTable tabla = new JTable();
     private DefaultTableModel modelo = new DefaultTableModel();
 
-    JTextField txtMat = new JTextField(10);
-    JTextField txtMarca = new JTextField(10);
-    JTextField txtModelo = new JTextField(10);
-    JTextField txtGama = new JTextField(10);
+    JTextField txtMat      = new JTextField(10);
+    JTextField txtMarca    = new JTextField(10);
+    JTextField txtModelo   = new JTextField(10);
+    JTextField txtGama     = new JTextField(10);
     JTextField txtDescGama = new JTextField(10);
     JTextField txtPrecioGama = new JTextField(10);
-    JTextField txtColor = new JTextField(10);
+    JTextField txtColor    = new JTextField(10);
 
     JComboBox<String> cmbTipoVeh = new JComboBox<>(new String[]{"0-Normal", "1-Turístico"});
-    JComboBox<String> cmbMotor = new JComboBox<>(new String[]{"0-Gasolina", "1-Diésel"});
+    JComboBox<String> cmbMotor   = new JComboBox<>(new String[]{"0-Gasolina", "1-Diésel"});
 
-    JCheckBox chkTecho = new JCheckBox("Techo");
-    JCheckBox chkAire = new JCheckBox("Aire");
-    JCheckBox chkCuero = new JCheckBox("Cuero");
-    JCheckBox chkAuto = new JCheckBox("Automático");
+    JCheckBox chkTecho  = new JCheckBox("Techo");
+    JCheckBox chkAire   = new JCheckBox("Aire");
+    JCheckBox chkCuero  = new JCheckBox("Cuero");
+    JCheckBox chkAuto   = new JCheckBox("Automático");
     JCheckBox chkStatus = new JCheckBox("Disponible", true);
 
     public RegistroVehiculo(MenuAdmin m) {
@@ -83,7 +85,7 @@ public class RegistroVehiculo extends MantenimientoBase {
         });
 
         tabla.setModel(modelo);
-        tabla.setEnabled(true); // 🔥 CLAVE
+        tabla.setEnabled(true);
 
         contenedor.add(new JScrollPane(tabla), BorderLayout.CENTER);
 
@@ -95,37 +97,79 @@ public class RegistroVehiculo extends MantenimientoBase {
     }
 
     private void eventos() {
-        txtMat.addActionListener(e -> buscarVehiculo());
-        txtGama.addActionListener(e -> buscarGama());
+        // ✅ FIX #2: ActionListeners de txtMat UNIFICADOS en uno solo.
+        // Antes había DOS addActionListener en txtMat: uno buscaba, otro movía foco.
+        // El primero cancelaba al segundo. Ahora es uno solo que hace ambas cosas.
+        txtMat.addActionListener(e -> {
+            buscarVehiculo();
+            txtMarca.requestFocus();
+        });
 
-        txtMat.addActionListener(e -> txtMarca.requestFocus());
+        // ✅ FIX #2: Navegación con Enter corregida para todos los campos.
+        // Antes cmbTipoVeh y cmbMotor usaban addActionListener que dispara
+        // al cambiar selección, no solo al presionar Enter. Se usa KeyListener.
         txtMarca.addActionListener(e -> txtModelo.requestFocus());
         txtModelo.addActionListener(e -> cmbTipoVeh.requestFocus());
-        cmbTipoVeh.addActionListener(e -> cmbMotor.requestFocus());
-        cmbMotor.addActionListener(e -> txtGama.requestFocus());
+
+        // ComboBoxes: usar KeyListener para Enter, no ActionListener
+        // (ActionListener en JComboBox se dispara al cambiar ítem, no al presionar Enter)
+        cmbTipoVeh.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent e) {
+                if (e.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER)
+                    cmbMotor.requestFocus();
+            }
+        });
+        cmbMotor.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent e) {
+                if (e.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER)
+                    txtGama.requestFocus();
+            }
+        });
+
+        // ✅ FIX #4: txtGama tiene UN SOLO ActionListener que busca gama Y mueve foco.
+        // Antes había DOS listeners en txtGama registrados (uno al inicio de eventos()
+        // y otro al final), causando que buscarGama() se llamara dos veces y el foco
+        // se moviera antes de que terminara la búsqueda.
         txtGama.addActionListener(e -> {
             buscarGama();
             txtColor.requestFocus();
         });
+
         txtColor.addActionListener(e -> chkTecho.requestFocus());
 
+        // Click en tabla → carga el vehículo
         tabla.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 int fila = tabla.getSelectedRow();
-                txtMat.setText(modelo.getValueAt(fila, 0).toString());
-                buscarVehiculo(); // 🔥 YA NO postActionEvent
+                if (fila >= 0) {
+                    txtMat.setText(modelo.getValueAt(fila, 0).toString());
+                    buscarVehiculo();
+                }
             }
         });
+
+        // Checks marcan que el usuario los tocó
         chkTecho.addActionListener(e -> chkTocado = true);
-        chkAire.addActionListener(e -> chkTocado = true);
+        chkAire.addActionListener(e  -> chkTocado = true);
         chkCuero.addActionListener(e -> chkTocado = true);
-        chkAuto.addActionListener(e -> chkTocado = true);
+        chkAuto.addActionListener(e  -> chkTocado = true);
     }
 
+    // ✅ FIX #4: buscarGama() lee txtGama en el momento de llamarse.
+    // Antes, cuando buscarVehiculo() hacía txtGama.setText(...) y luego llamaba
+    // buscarGama(), esto funcionaba, pero el ActionListener de txtGama también
+    // disparaba buscarGama() una segunda vez con texto a veces vacío (race condition
+    // de eventos Swing). Ahora buscarGama() es llamado explícitamente solo desde
+    // el ActionListener unificado y desde buscarVehiculo(), sin duplicación.
     private void buscarGama() {
+        String idGama = txtGama.getText().trim();
+        if (idGama.isEmpty()) {
+            txtDescGama.setText("");
+            txtPrecioGama.setText("");
+            return;
+        }
         try {
-            Gama g = gamaDAO.buscarPorId(txtGama.getText().trim());
-
+            Gama g = gamaDAO.buscarPorId(idGama);
             if (g != null) {
                 txtDescGama.setText(g.getDescripcion());
                 txtPrecioGama.setText(String.valueOf(g.getPrecio()));
@@ -134,7 +178,6 @@ public class RegistroVehiculo extends MantenimientoBase {
                 txtPrecioGama.setText("");
                 JOptionPane.showMessageDialog(this, "Id Gama no existe");
             }
-
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error buscando Gama");
         }
@@ -142,14 +185,13 @@ public class RegistroVehiculo extends MantenimientoBase {
 
     private void buscarVehiculo() {
         try {
-            Vehiculo v = dao.buscar(txtMat.getText());
+            Vehiculo v = dao.buscar(txtMat.getText().trim());
 
             if (v != null) {
                 original = v.getMatricula();
 
                 txtMarca.setText(v.getMarca());
                 txtModelo.setText(v.getModelo());
-                txtGama.setText(v.getGama());
                 txtColor.setText(v.getColor());
 
                 cmbTipoVeh.setSelectedIndex(v.getTipoVehiculo());
@@ -161,8 +203,18 @@ public class RegistroVehiculo extends MantenimientoBase {
                 chkAuto.setSelected(v.isAutomatico());
                 chkStatus.setSelected(v.isStatus());
 
-                buscarGama();
+                // ✅ FIX #4: Primero ponemos el texto en txtGama, LUEGO buscamos la gama.
+                // Este orden ya existía antes, pero ahora es explícito y sin duplicación
+                // de listeners. txtDescGama y txtPrecioGama se llenan correctamente
+                // porque buscarGama() lee txtGama.getText() que ya tiene el valor.
+                txtGama.setText(v.getGama());
+                buscarGama(); // Llama directamente, sin disparar ActionListener
+
+                // ✅ FIX #3: Marcar chkTocado = true al cargar un registro existente,
+                // ya que los checks vienen del archivo (el usuario no necesita tocarlos
+                // de nuevo para que sean válidos en modificación).
                 chkTocado = true;
+
                 estadoModificar();
             } else {
                 estadoNuevo();
@@ -204,28 +256,25 @@ public class RegistroVehiculo extends MantenimientoBase {
         chkAuto.setSelected(false);
         chkStatus.setSelected(true);
 
-        original = "";
+        original  = "";
         chkTocado = false;
         cargarTabla();
-
     }
 
     @Override
-
     protected boolean validarCampos() {
-
         if (txtMat.getText().isEmpty()
                 || txtMarca.getText().isEmpty()
                 || txtModelo.getText().isEmpty()
                 || txtGama.getText().isEmpty()
                 || txtColor.getText().isEmpty()) {
-
             JOptionPane.showMessageDialog(this, "Campos obligatorios vacíos");
             return false;
         }
 
         if (!chkTocado) {
-            JOptionPane.showMessageDialog(this, "Debe seleccionar las características del vehículo (checks)");
+            JOptionPane.showMessageDialog(this,
+                "Debe seleccionar las características del vehículo (checks)");
             return false;
         }
 
@@ -272,7 +321,7 @@ public class RegistroVehiculo extends MantenimientoBase {
     @Override
     protected void eliminarRegistro() {
         try {
-            dao.eliminar(original); // 🔥 AHORA SÍ BORRA
+            dao.eliminar(original);
             JOptionPane.showMessageDialog(this, "Vehículo eliminado");
             limpiarCampos();
         } catch (Exception e) {

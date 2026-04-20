@@ -109,20 +109,27 @@ public class RegistroRecepcion extends MantenimientoBase {
         });
     }
 
-    private void cargarReserva(){
-        try{
-            for(Reserva r: reservaDAO.listar()){
-                if(r.getMatricula().equals(txtMatricula.getText())){
-                    txtFechaEntrada.setText(r.getFechaEntrada());
-                    return;
-                }
-            }
-            JOptionPane.showMessageDialog(this,"No hay reserva");
+   private void cargarReserva(){
+    try{
+        boolean encontrada = false;
 
-        }catch(Exception e){
-            JOptionPane.showMessageDialog(this,"Error");
+        for(Reserva r: reservaDAO.listar()){
+            if(r.getMatricula().equals(txtMatricula.getText())){
+                txtFechaEntrada.setText(r.getFechaEntrada());
+                encontrada = true;
+                break;
+            }
         }
+
+        if(!encontrada){
+            txtFechaEntrada.setText("");
+            JOptionPane.showMessageDialog(this,"No hay reserva para este vehículo");
+        }
+
+    }catch(Exception e){
+        JOptionPane.showMessageDialog(this,"Error cargando reserva");
     }
+}
 
     private String getFechaSpinner(){
         Date date = (Date) spFechaRecepcion.getValue();
@@ -166,38 +173,56 @@ public class RegistroRecepcion extends MantenimientoBase {
     }
 
     @Override
-    protected boolean validarCampos() {
+  
+protected boolean validarCampos() {
 
-        if(txtId.getText().isEmpty()
-                || txtMatricula.getText().isEmpty()){
-            JOptionPane.showMessageDialog(this,"Campos obligatorios");
-            return false;
-        }
-
-        // 🔥 VALIDAR ID DUPLICADO
-        try{
-            Recepcion existente = dao.buscar(txtId.getText());
-
-            if(existente != null && !txtId.getText().equals(original)){
-                JOptionPane.showMessageDialog(this,"ID ya existe");
-                return false;
-            }
-
-            LocalDate entrada = LocalDate.parse(txtFechaEntrada.getText());
-            LocalDate recepcion = LocalDate.parse(getFechaSpinner());
-
-            if(recepcion.isBefore(entrada)){
-                JOptionPane.showMessageDialog(this,"Fecha inválida");
-                return false;
-            }
-
-        }catch(Exception e){
-            JOptionPane.showMessageDialog(this,"Error en datos");
-            return false;
-        }
-
-        return true;
+    if(txtId.getText().isEmpty()
+            || txtMatricula.getText().isEmpty()){
+        JOptionPane.showMessageDialog(this,"Campos obligatorios");
+        return false;
     }
+
+    // 🔥 VALIDAR QUE HAYA RESERVA CARGADA
+    if(txtFechaEntrada.getText().isEmpty()){
+        JOptionPane.showMessageDialog(this,"Debe cargar una reserva válida");
+        return false;
+    }
+
+    try{
+        Recepcion existente = dao.buscar(txtId.getText());
+
+        if(existente != null && !txtId.getText().equals(original)){
+            JOptionPane.showMessageDialog(this,"ID ya existe");
+            return false;
+        }
+
+        LocalDate entrada;
+
+try {
+    entrada = LocalDate.parse(txtFechaEntrada.getText());
+} catch (Exception e) {
+
+    java.time.format.DateTimeFormatter formatter =
+            java.time.format.DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss z yyyy", java.util.Locale.ENGLISH);
+
+    entrada = java.time.ZonedDateTime
+            .parse(txtFechaEntrada.getText(), formatter)
+            .toLocalDate();
+}
+        LocalDate recepcion = LocalDate.parse(getFechaSpinner());
+
+        if(recepcion.isBefore(entrada)){
+            JOptionPane.showMessageDialog(this,"La recepción no puede ser menor que la entrada");
+            return false;
+        }
+
+    }catch(Exception e){
+        JOptionPane.showMessageDialog(this,"Formato de fecha inválido");
+        return false;
+    }
+
+    return true;
+}
 
     @Override
     protected void guardarRegistro() {

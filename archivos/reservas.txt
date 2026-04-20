@@ -1,1 +1,1 @@
-matricula;cedula;oferta;fechaReserva;fechaSalida;fechaEntrada;observacion;dias;total
+idReserva;matricula;cedula;oferta;fechaReserva;fechaSalida;fechaEntrada;observacion;dias;total
