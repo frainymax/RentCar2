@@ -1,1 +1,2 @@
-id;matricula;fechaEntrada;fechaRecepcion;observacion
+id;idReserva;matricula;fechaEntrada;fechaRecepcion;observacion
+1;1;A123;2026-04-21;2026-04-22;lapara

@@ -6,6 +6,8 @@ import com.mycompany.rentcar.modelo.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -28,15 +30,15 @@ public class RegistroReserva extends MantenimientoBase {
 
     // ─── Campos del formulario ───────────────────────────────────────────────
 
-    JTextField txtIdReserva    = new JTextField(15);  // solo lectura, autogenerado
+    JTextField txtIdReserva    = new JTextField(15);
     JTextField txtMatricula    = new JTextField(15);
     JTextField txtCedula       = new JTextField(15);
     JTextField txtOferta       = new JTextField(15);
-    JTextField txtNombre       = new JTextField(15);  // solo lectura
-    JTextField txtVehiculo     = new JTextField(15);  // solo lectura
-    JTextField txtFechaReserva = new JTextField(15);  // solo lectura, hoy
-    JTextField txtDias         = new JTextField(15);  // solo lectura, calculado
-    JTextField txtTotal        = new JTextField(15);  // solo lectura, calculado
+    JTextField txtNombre       = new JTextField(15);
+    JTextField txtVehiculo     = new JTextField(15);
+    JTextField txtFechaReserva = new JTextField(15);
+    JTextField txtDias         = new JTextField(15);
+    JTextField txtTotal        = new JTextField(15);
     JTextField txtObs          = new JTextField(15);
 
     JSpinner spnSalida  = new JSpinner(new SpinnerDateModel());
@@ -161,8 +163,36 @@ public class RegistroReserva extends MantenimientoBase {
             spnSalida.requestFocus();
         });
 
-        spnSalida.addChangeListener(e  -> calcular());
-        spnEntrada.addChangeListener(e -> calcular());
+        // ─────────────────────────────────────────────────────────────────────
+        // SPINNER SALIDA
+        // ChangeListener: actualiza el cálculo en tiempo real mientras el usuario
+        // mueve las flechas (sin mensajes, para no interrumpir).
+        // FocusListener en el editor interno: cuando el usuario abandona el spinner,
+        // AHÍ SÍ se valida con mensaje y se recalcula.
+        // ─────────────────────────────────────────────────────────────────────
+        spnSalida.addChangeListener(e -> calcularSilencioso());
+
+        ((JSpinner.DefaultEditor) spnSalida.getEditor()).getTextField()
+            .addFocusListener(new FocusAdapter() {
+                @Override
+                public void focusLost(FocusEvent e) {
+                    validarYCalcular();
+                }
+            });
+
+        // ─────────────────────────────────────────────────────────────────────
+        // SPINNER ENTRADA
+        // Misma lógica que spnSalida.
+        // ─────────────────────────────────────────────────────────────────────
+        spnEntrada.addChangeListener(e -> calcularSilencioso());
+
+        ((JSpinner.DefaultEditor) spnEntrada.getEditor()).getTextField()
+            .addFocusListener(new FocusAdapter() {
+                @Override
+                public void focusLost(FocusEvent e) {
+                    validarYCalcular();
+                }
+            });
 
         txtObs.addActionListener(e -> btnGuardar.requestFocus());
 
@@ -251,40 +281,34 @@ public class RegistroReserva extends MantenimientoBase {
                 return;
             }
 
-            calcular();
+            // Oferta válida, recalcular
+            validarYCalcular();
 
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Error al buscar la oferta");
         }
     }
 
-    // ─── Cálculo de días y total ─────────────────────────────────────────────
+    // ─── Cálculo silencioso (mientras el usuario mueve las flechas) ──────────
 
     /**
-     * Reglas de fechas según el documento y el maestro:
-     *
-     *  1. Fecha Salida  >= Fecha Reserva (hoy)
-     *  2. Fecha Entrada >= Fecha Reserva (hoy)
-     *  3. Fecha Entrada >= Fecha Salida
-     *  4. Si Salida == Entrada → se considera 1 día (mismo día cuenta como un día)
-     *     Si Salida < Entrada  → días = (Entrada - Salida) + 1
-     *     Ejemplo: sale el 20, entra el 22 → 3 días (20, 21, 22)
+     * Se llama desde los ChangeListener de los spinners.
+     * Actualiza días y total en tiempo real SIN mostrar mensajes de error,
+     * para no interrumpir al usuario mientras navega con las flechas.
+     * Si las fechas no son válidas, simplemente deja los campos vacíos.
      */
-    private void calcular() {
+    private void calcularSilencioso() {
         try {
             LocalDate hoy     = LocalDate.now();
             LocalDate salida  = spinnerALocalDate(spnSalida);
             LocalDate entrada = spinnerALocalDate(spnEntrada);
 
-            // Validación silenciosa mientras el usuario navega:
-            // Si las fechas no tienen sentido todavía, simplemente limpia sin molestar.
             if (salida.isBefore(hoy) || entrada.isBefore(hoy) || entrada.isBefore(salida)) {
                 txtDias.setText("");
                 txtTotal.setText("");
                 return;
             }
 
-            // ✅ Mismo día = 1 día. Días normales = diferencia + 1.
             long dias = ChronoUnit.DAYS.between(salida, entrada) + 1;
             txtDias.setText(String.valueOf(dias));
 
@@ -296,6 +320,87 @@ public class RegistroReserva extends MantenimientoBase {
             txtTotal.setText("");
         }
     }
+
+    // ─── Validar con mensajes + calcular (cuando el spinner pierde el foco) ──
+
+    /**
+     * Se llama cuando el usuario termina de editar un spinner (al salir del campo).
+     * Aquí SÍ se muestran los mensajes de error y se pinta el spinner en rojo
+     * si la fecha es inválida.
+     *
+     * Reglas:
+     *   1. Fecha Salida  no puede ser anterior a Fecha Reserva (hoy)
+     *   2. Fecha Entrada no puede ser anterior a Fecha Reserva (hoy)
+     *   3. Fecha Entrada no puede ser anterior a Fecha Salida
+     *   4. Mismo día (Salida == Entrada) = 1 día válido
+     */
+    private void validarYCalcular() {
+        LocalDate hoy     = LocalDate.now();
+        LocalDate salida  = spinnerALocalDate(spnSalida);
+        LocalDate entrada = spinnerALocalDate(spnEntrada);
+
+        // Resetear color de spinners
+        spnSalida.getEditor().getComponent(0).setBackground(Color.WHITE);
+        spnEntrada.getEditor().getComponent(0).setBackground(Color.WHITE);
+
+        // ── Regla 1: Salida >= hoy ────────────────────────────────────────────
+        if (salida.isBefore(hoy)) {
+            JOptionPane.showMessageDialog(this,
+                "La Fecha de Salida (" + salida.format(FMT) + ") no puede ser\n"
+                + "anterior a la fecha de la reserva (" + hoy.format(FMT) + ").");
+            // Pintar spinner en rojo y resetear a hoy
+            spnSalida.getEditor().getComponent(0).setBackground(new Color(255, 200, 200));
+            spnSalida.setValue(Date.from(hoy.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+            txtDias.setText("");
+            txtTotal.setText("");
+            return;
+        }
+
+        // ── Regla 2: Entrada >= hoy ───────────────────────────────────────────
+        if (entrada.isBefore(hoy)) {
+            JOptionPane.showMessageDialog(this,
+                "La Fecha de Entrada (" + entrada.format(FMT) + ") no puede ser\n"
+                + "anterior a la fecha de la reserva (" + hoy.format(FMT) + ").");
+            spnEntrada.getEditor().getComponent(0).setBackground(new Color(255, 200, 200));
+            spnEntrada.setValue(Date.from(hoy.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+            txtDias.setText("");
+            txtTotal.setText("");
+            return;
+        }
+
+        // ── Regla 3: Entrada >= Salida ────────────────────────────────────────
+        if (entrada.isBefore(salida)) {
+            JOptionPane.showMessageDialog(this,
+                "La Fecha de Entrada (" + entrada.format(FMT) + ") no puede ser\n"
+                + "anterior a la Fecha de Salida (" + salida.format(FMT) + ").");
+            spnEntrada.getEditor().getComponent(0).setBackground(new Color(255, 200, 200));
+            // Resetear entrada a la misma fecha de salida (mínimo válido = mismo día)
+            spnEntrada.setValue(Date.from(salida.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+            // Con la corrección automática, calcular 1 día
+            txtDias.setText("1");
+            try {
+                double precio = obtenerPrecio();
+                txtTotal.setText(String.format("%.2f", precio * 1));
+            } catch (Exception ignored) {}
+            return;
+        }
+
+        // ── Todas las reglas pasan: calcular ──────────────────────────────────
+        try {
+            // Mismo día = 1 día. Entrada > Salida = diferencia + 1.
+            long dias = ChronoUnit.DAYS.between(salida, entrada) + 1;
+            txtDias.setText(String.valueOf(dias));
+
+            double precio = obtenerPrecio();
+            txtTotal.setText(String.format("%.2f", precio * dias));
+
+        } catch (Exception ignored) {
+            txtDias.setText("");
+            txtTotal.setText("");
+        }
+    }
+
+    // ─── Utilidades de fecha ─────────────────────────────────────────────────
 
     private LocalDate spinnerALocalDate(JSpinner spinner) {
         Date fecha = (Date) spinner.getValue();
@@ -428,6 +533,10 @@ public class RegistroReserva extends MantenimientoBase {
         spnSalida.setValue(hoy);
         spnEntrada.setValue(hoy);
 
+        // Resetear color de spinners
+        spnSalida.getEditor().getComponent(0).setBackground(Color.WHITE);
+        spnEntrada.getEditor().getComponent(0).setBackground(Color.WHITE);
+
         lblEstado.setText("Creando");
         desbloquearFormulario();
         btnGuardar.setEnabled(true);
@@ -462,29 +571,22 @@ public class RegistroReserva extends MantenimientoBase {
         LocalDate salida  = spinnerALocalDate(spnSalida);
         LocalDate entrada = spinnerALocalDate(spnEntrada);
 
-        // ✅ Fecha Salida no puede ser anterior a Fecha Reserva (hoy)
         if (salida.isBefore(hoy)) {
             JOptionPane.showMessageDialog(this,
                 "La Fecha de Salida no puede ser anterior a la fecha de reserva (" + hoy.format(FMT) + ")");
             return false;
         }
-
-        // ✅ Fecha Entrada no puede ser anterior a Fecha Reserva (hoy)
         if (entrada.isBefore(hoy)) {
             JOptionPane.showMessageDialog(this,
                 "La Fecha de Entrada no puede ser anterior a la fecha de reserva (" + hoy.format(FMT) + ")");
             return false;
         }
-
-        // ✅ Fecha Entrada no puede ser anterior a Fecha Salida
-        // (igual sí se permite → mismo día = 1 día)
         if (entrada.isBefore(salida)) {
             JOptionPane.showMessageDialog(this,
                 "La Fecha de Entrada no puede ser anterior a la Fecha de Salida");
             return false;
         }
 
-        // ✅ Revalidar oferta si se ingresó
         String idOferta = txtOferta.getText().trim();
         if (!idOferta.isEmpty()) {
             try {

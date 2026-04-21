@@ -1,1 +1,2 @@
 idReserva;matricula;cedula;oferta;fechaReserva;fechaSalida;fechaEntrada;observacion;dias;total
+1;A123;123;1;2026-04-21;2026-04-21;2026-04-21;WAOS;1;900.0
