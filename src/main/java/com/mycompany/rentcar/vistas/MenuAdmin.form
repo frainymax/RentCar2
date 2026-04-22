@@ -89,75 +89,37 @@
             <Property name="text" type="java.lang.String" value="Consultas"/>
           </Properties>
           <SubComponents>
-            <MenuItem class="javax.swing.JMenuItem" name="itemConClientes">
+            <MenuItem class="javax.swing.JMenuItem" name="ConsultaClientes">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Clientes"/>
+                <Property name="text" type="java.lang.String" value="Consulta Clientes"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ConsultaClientesActionPerformed"/>
+              </Events>
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="itemConClientesId">
+            <MenuItem class="javax.swing.JMenuItem" name="ConsultaVehiculos">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Clientes por ID"/>
+                <Property name="text" type="java.lang.String" value="Consulta Vehiculos"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ConsultaVehiculosActionPerformed"/>
+              </Events>
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="itemConClientesRango">
+            <MenuItem class="javax.swing.JMenuItem" name="ConsultaReservas">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Clientes por rango ID"/>
+                <Property name="text" type="java.lang.String" value="Consulta Reservas"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ConsultaReservasActionPerformed"/>
+              </Events>
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="itemConVehiculos">
+            <MenuItem class="javax.swing.JMenuItem" name="jMenuItem6">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Vehiculos"/>
+                <Property name="text" type="java.lang.String" value="Consulta Recepcion"/>
               </Properties>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="itemConVehMatricula">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Vehiculo por matricula"/>
-              </Properties>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="itemConVehDisponibles">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Vehiculos disponibles"/>
-              </Properties>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="itemConVehRentados">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Vehiculos Rentados"/>
-              </Properties>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="itemConVehMarca">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Vehiculos por marca"/>
-              </Properties>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="itemConVehGama">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Vehiculos por gama"/>
-              </Properties>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="itemConOfertas">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Ofertas"/>
-              </Properties>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="itemConVehPrecio">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Vehiculos por precio"/>
-              </Properties>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="itemConReservaFecha">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Reservas por fecha"/>
-              </Properties>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="itemConReservaDias">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Reservas por dias"/>
-              </Properties>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="itemConRecepcionFecha">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Recepcion por fecha"/>
-              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItem6ActionPerformed"/>
+              </Events>
             </MenuItem>
           </SubComponents>
         </Menu>

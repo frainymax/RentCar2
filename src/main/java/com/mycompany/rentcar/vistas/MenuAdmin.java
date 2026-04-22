@@ -56,20 +56,10 @@ public class MenuAdmin extends javax.swing.JFrame {
         itemReservas = new javax.swing.JMenuItem();
         itemRecepcion = new javax.swing.JMenuItem();
         menuConsultas = new javax.swing.JMenu();
-        itemConClientes = new javax.swing.JMenuItem();
-        itemConClientesId = new javax.swing.JMenuItem();
-        itemConClientesRango = new javax.swing.JMenuItem();
-        itemConVehiculos = new javax.swing.JMenuItem();
-        itemConVehMatricula = new javax.swing.JMenuItem();
-        itemConVehDisponibles = new javax.swing.JMenuItem();
-        itemConVehRentados = new javax.swing.JMenuItem();
-        itemConVehMarca = new javax.swing.JMenuItem();
-        itemConVehGama = new javax.swing.JMenuItem();
-        itemConOfertas = new javax.swing.JMenuItem();
-        itemConVehPrecio = new javax.swing.JMenuItem();
-        itemConReservaFecha = new javax.swing.JMenuItem();
-        itemConReservaDias = new javax.swing.JMenuItem();
-        itemConRecepcionFecha = new javax.swing.JMenuItem();
+        ConsultaClientes = new javax.swing.JMenuItem();
+        ConsultaVehiculos = new javax.swing.JMenuItem();
+        ConsultaReservas = new javax.swing.JMenuItem();
+        jMenuItem6 = new javax.swing.JMenuItem();
         Sesion = new javax.swing.JMenu();
         itemCerrarSesion = new javax.swing.JMenuItem();
 
@@ -145,47 +135,37 @@ public class MenuAdmin extends javax.swing.JFrame {
 
         menuConsultas.setText("Consultas");
 
-        itemConClientes.setText("Clientes");
-        menuConsultas.add(itemConClientes);
+        ConsultaClientes.setText("Consulta Clientes");
+        ConsultaClientes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ConsultaClientesActionPerformed(evt);
+            }
+        });
+        menuConsultas.add(ConsultaClientes);
 
-        itemConClientesId.setText("Clientes por ID");
-        menuConsultas.add(itemConClientesId);
+        ConsultaVehiculos.setText("Consulta Vehiculos");
+        ConsultaVehiculos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ConsultaVehiculosActionPerformed(evt);
+            }
+        });
+        menuConsultas.add(ConsultaVehiculos);
 
-        itemConClientesRango.setText("Clientes por rango ID");
-        menuConsultas.add(itemConClientesRango);
+        ConsultaReservas.setText("Consulta Reservas");
+        ConsultaReservas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ConsultaReservasActionPerformed(evt);
+            }
+        });
+        menuConsultas.add(ConsultaReservas);
 
-        itemConVehiculos.setText("Vehiculos");
-        menuConsultas.add(itemConVehiculos);
-
-        itemConVehMatricula.setText("Vehiculo por matricula");
-        menuConsultas.add(itemConVehMatricula);
-
-        itemConVehDisponibles.setText("Vehiculos disponibles");
-        menuConsultas.add(itemConVehDisponibles);
-
-        itemConVehRentados.setText("Vehiculos Rentados");
-        menuConsultas.add(itemConVehRentados);
-
-        itemConVehMarca.setText("Vehiculos por marca");
-        menuConsultas.add(itemConVehMarca);
-
-        itemConVehGama.setText("Vehiculos por gama");
-        menuConsultas.add(itemConVehGama);
-
-        itemConOfertas.setText("Ofertas");
-        menuConsultas.add(itemConOfertas);
-
-        itemConVehPrecio.setText("Vehiculos por precio");
-        menuConsultas.add(itemConVehPrecio);
-
-        itemConReservaFecha.setText("Reservas por fecha");
-        menuConsultas.add(itemConReservaFecha);
-
-        itemConReservaDias.setText("Reservas por dias");
-        menuConsultas.add(itemConReservaDias);
-
-        itemConRecepcionFecha.setText("Recepcion por fecha");
-        menuConsultas.add(itemConRecepcionFecha);
+        jMenuItem6.setText("Consulta Recepcion");
+        jMenuItem6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem6ActionPerformed(evt);
+            }
+        });
+        menuConsultas.add(jMenuItem6);
 
         jMenuBar1.add(menuConsultas);
 
@@ -275,28 +255,40 @@ this.setVisible(false);
 this.setVisible(false);
     }//GEN-LAST:event_itemRecepcionActionPerformed
 
+    private void ConsultaReservasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ConsultaReservasActionPerformed
+        // TODO add your handling code here:
+        new ConsultaReservas(this).setVisible(true);
+this.setVisible(false);
+    }//GEN-LAST:event_ConsultaReservasActionPerformed
+
+    private void ConsultaClientesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ConsultaClientesActionPerformed
+        // TODO add your handling code here:
+        new ConsultaClientes(this).setVisible(true);
+this.setVisible(false);
+    }//GEN-LAST:event_ConsultaClientesActionPerformed
+
+    private void ConsultaVehiculosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ConsultaVehiculosActionPerformed
+        // TODO add your handling code here:
+        new ConsultaVehiculos(this).setVisible(true);
+this.setVisible(false);
+    }//GEN-LAST:event_ConsultaVehiculosActionPerformed
+
+    private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem6ActionPerformed
+      new ConsultaRecepcion(this).setVisible(true);
+this.setVisible(false);
+    }//GEN-LAST:event_jMenuItem6ActionPerformed
+
     /**
      * @param args the command line arguments
      */
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem ConsultaClientes;
+    private javax.swing.JMenuItem ConsultaReservas;
+    private javax.swing.JMenuItem ConsultaVehiculos;
     private javax.swing.JMenu Sesion;
     private javax.swing.JMenuItem itemCerrarSesion;
     private javax.swing.JMenuItem itemClientes;
-    private javax.swing.JMenuItem itemConClientes;
-    private javax.swing.JMenuItem itemConClientesId;
-    private javax.swing.JMenuItem itemConClientesRango;
-    private javax.swing.JMenuItem itemConOfertas;
-    private javax.swing.JMenuItem itemConRecepcionFecha;
-    private javax.swing.JMenuItem itemConReservaDias;
-    private javax.swing.JMenuItem itemConReservaFecha;
-    private javax.swing.JMenuItem itemConVehDisponibles;
-    private javax.swing.JMenuItem itemConVehGama;
-    private javax.swing.JMenuItem itemConVehMarca;
-    private javax.swing.JMenuItem itemConVehMatricula;
-    private javax.swing.JMenuItem itemConVehPrecio;
-    private javax.swing.JMenuItem itemConVehRentados;
-    private javax.swing.JMenuItem itemConVehiculos;
     private javax.swing.JMenuItem itemGamas;
     private javax.swing.JMenuItem itemOfertas;
     private javax.swing.JMenuItem itemRecepcion;
@@ -306,6 +298,7 @@ this.setVisible(false);
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem6;
     private javax.swing.JMenu menuConsultas;
     private javax.swing.JMenu menuMantenimientos;
     private javax.swing.JMenu menuMovimiento;
